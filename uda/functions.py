@@ -38,7 +38,7 @@ def train(model, loader, optimizer, scheduler, logger, args, epoch, print_freq =
 def validate(model, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
 	dices = []
-	for i, batch in enumerate(tqdm(loader)):
+	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda()
 		volume = volume.view((-1,) + volume.shape[2:])
