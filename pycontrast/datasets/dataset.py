@@ -34,12 +34,9 @@ class ImageFolderInstance(datasets.ImageFolder):
                 img = torch.cat([img, img2], dim=0)
         else:
             img = image
-
-        # # jigsaw
+            
         if self.use_jigsaw:
             jigsaw_image = self.jigsaw_transform(image)
-
-        if self.use_jigsaw:
             return img, index, jigsaw_image
         else:
             return img, index
