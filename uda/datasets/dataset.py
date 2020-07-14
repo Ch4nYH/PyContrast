@@ -4,8 +4,8 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import Dataset
 
-from paths import get_paths
-from transforms import get_transform
+from .paths import get_paths
+from .transforms import get_transform
 
 class DatasetInstance(Dataset):
 
