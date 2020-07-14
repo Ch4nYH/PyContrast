@@ -9,6 +9,7 @@ def parse_args():
 	parser.add_argument('--seed', type=int, default = 42)
 	parser.add_argument('--start-epoch', type=int, default=0)
 	parser.add_argument('--epochs', type=int, default=100)
+	parser.add_argument('--batch-size', type=int, default=1)
 	args = parser.parse_args()
 
 	return args
