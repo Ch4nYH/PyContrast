@@ -7,8 +7,10 @@ def train(model, loader, optimizer, scheduler, logger, args, epoch):
 	model.train()
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
-		volume = batch['image'].cuda().view((-1,) + volume.shape[2:])
-		label  = batch['label'].cuda().view((-1,) + label.shape[2:])
+		volume = batch['image'].cuda()
+		volume = volume.view((-1,) + volume.shape[2:])
+		label  = batch['label'].cuda()
+		label  = label.view((-1,) + label.shape[2:])
 
 		output = model(volume)
 		loss = cross_entropy_3d(output, label)
@@ -32,8 +34,10 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
-		volume = batch['image'].cuda().view((-1,) + volume.shape[2:])
-		label  = batch['label'].cuda().view((-1,) + label.shape[2:])
+		volume = batch['image'].cuda()
+		volume = volume.view((-1,) + volume.shape[2:])
+		label  = batch['label'].cuda()
+		label  = label.view((-1,) + label.shape[2:])
 
 		output = model(volume)
 		pred = output.argmax(dim = 1)
