@@ -28,7 +28,7 @@ class DatasetInstance(Dataset):
         return len(self.image_list)
 
     def __getitem__(self, index):
-        img_name = os.path.join(self.root_dir, self.image_list[idx])
+        img_name = os.path.join(self.root_dir, self.image_list[index])
         data = h5py.File(img_name, 'r')
         image = np.array(data['image'], dtype=np.float32) 
         label = np.array(data['label'])
