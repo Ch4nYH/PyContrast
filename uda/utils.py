@@ -36,11 +36,13 @@ class Logger(object):
 
 class Saver(object):
 
-	def __init__(self, path):
+	def __init__(self, path, save_interval = 10):
 		self.path = path
 		self.best_dice = 0
+		self.save_interval = save_interval
 	def save(self, epoch, states, dice):
-		torch.save(states, os.path.join(self.path, 'model', 'checkpoint_{}.pth.tar'.format(epoch)))
-		if dice > self.best_dice:
-			torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))
-			self.best_dice = dice
+		if epoch % self.save_interval == 0:
+			torch.save(states, os.path.join(self.path, 'model', 'checkpoint_{}.pth.tar'.format(epoch)))
+			if dice > self.best_dice:
+				torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))
+				self.best_dice = dice
