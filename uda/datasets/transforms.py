@@ -109,14 +109,14 @@ class RandomRotate(object):
 class ToTensor(object):
   """Convert ndarrays in sample to Tensors."""
 
-  def __call__(self, sample):
-	image, label = sample['image'], sample['label']
-	if image.ndim >= 5:                                                     # already has channel dim
-		image = torch.from_numpy(image.astype(np.float32))
-	else:
-		image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
-	label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
-	return {'image': image, 'label': label}
+	def __call__(self, sample):
+		image, label = sample['image'], sample['label']
+		if image.ndim >= 5:                                                     # already has channel dim
+			image = torch.from_numpy(image.astype(np.float32))
+		else:
+			image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
+		label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
+		return {'image': image, 'label': label}
 
 
 def build_transforms(args):
