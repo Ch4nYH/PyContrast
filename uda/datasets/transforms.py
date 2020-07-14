@@ -8,44 +8,44 @@ class RandomCrop(object):
 	output_size (int): Desired output size
   """
 
-  def __init__(self, output_size, sample_num=1, pad=32, is_binary=False):
-	self.output_size = output_size
-	self.sample_num = sample_num
-	self.pad = pad
-	self.is_binary = is_binary
+  	def __init__(self, output_size, sample_num=1, pad=32, is_binary=False):
+		self.output_size = output_size
+		self.sample_num = sample_num
+		self.pad = pad
+		self.is_binary = is_binary
 
-  def __call__(self, sample):
-	image, label = sample['image'], sample['label']
-	assert image.shape == label.shape
-	if self.is_binary and label.max() > 1:
-		label[label > 1] = 0
-	if any(np.array(image.shape) <= self.output_size):
-		pad_x = max(0, self.output_size - image.shape[0] + 1)
-		pad_y = max(0, self.output_size - image.shape[1] + 1)
-		pad_z = max(0, self.output_size - image.shape[2] + 1)
-		image = np.pad(image, ((0, pad_x), (0, pad_y), (0, pad_z)), 'mean')
-		label = np.pad(label, ((0, pad_x), (0, pad_y), (0, pad_z)), 'constant')
+  	def __call__(self, sample):
+		image, label = sample['image'], sample['label']
+		assert image.shape == label.shape
+		if self.is_binary and label.max() > 1:
+			label[label > 1] = 0
+		if any(np.array(image.shape) <= self.output_size):
+			pad_x = max(0, self.output_size - image.shape[0] + 1)
+			pad_y = max(0, self.output_size - image.shape[1] + 1)
+			pad_z = max(0, self.output_size - image.shape[2] + 1)
+			image = np.pad(image, ((0, pad_x), (0, pad_y), (0, pad_z)), 'mean')
+			label = np.pad(label, ((0, pad_x), (0, pad_y), (0, pad_z)), 'constant')
 
-	if self.pad < 0:
-		bbox = [[0, label.shape[0]], [0, label.shape[1]], [0, label.shape[2]]]
-	else:
-		tempL = np.nonzero(label)
-		bbox = [[max(0, np.min(tempL[0]) - self.pad), min(label.shape[0], np.max(tempL[0]) + 1 + self.pad)],
-				[max(0, np.min(tempL[1]) - self.pad), min(label.shape[1], np.max(tempL[1]) + 1 + self.pad)],
-				[max(0, np.min(tempL[2]) - self.pad), min(label.shape[2], np.max(tempL[2]) + 1 + self.pad)]]
+		if self.pad < 0:
+			bbox = [[0, label.shape[0]], [0, label.shape[1]], [0, label.shape[2]]]
+		else:
+			tempL = np.nonzero(label)
+			bbox = [[max(0, np.min(tempL[0]) - self.pad), min(label.shape[0], np.max(tempL[0]) + 1 + self.pad)],
+					[max(0, np.min(tempL[1]) - self.pad), min(label.shape[1], np.max(tempL[1]) + 1 + self.pad)],
+					[max(0, np.min(tempL[2]) - self.pad), min(label.shape[2], np.max(tempL[2]) + 1 + self.pad)]]
 
-	# crop random sample on whole image
-	output_image = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
-	output_label = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
-	for i in range(self.sample_num):
-		if bbox[0][1] - self.output_size <= bbox[0][0]:
-			print(bbox[0])
-		w1 = np.random.randint(bbox[0][0], bbox[0][1] - self.output_size + 1)
-		h1 = np.random.randint(bbox[1][0], bbox[1][1] - self.output_size + 1)
-		d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
-		output_image[i] = image[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
-		output_label[i] = label[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
-	return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
+		# crop random sample on whole image
+		output_image = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
+		output_label = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
+		for i in range(self.sample_num):
+			if bbox[0][1] - self.output_size <= bbox[0][0]:
+				print(bbox[0])
+			w1 = np.random.randint(bbox[0][0], bbox[0][1] - self.output_size + 1)
+			h1 = np.random.randint(bbox[1][0], bbox[1][1] - self.output_size + 1)
+			d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
+			output_image[i] = image[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
+			output_label[i] = label[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
+		return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
 
 
 class RandomTranspose(object):
