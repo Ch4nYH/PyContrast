@@ -3,6 +3,7 @@ import time
 import torch
 import dateutil.tz
 
+from tqdm import tqdm
 from utils import dice, Logger, Saver
 from config import parse_args
 from datetime import datetime
@@ -12,7 +13,6 @@ from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataloader
 
 from torch.utils.data import DataLoader
-
 from models.vnet import VNet
 
 def main():
