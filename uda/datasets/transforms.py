@@ -2,19 +2,19 @@
 import numpy as np
 
 class RandomCrop(object):
-  """
-  Crop randomly the image in a sample
-  Args:
-	output_size (int): Desired output size
-  """
+	"""
+	Crop randomly the image in a sample
+	Args:
+	  output_size (int): Desired output size
+	"""
 
-  	def __init__(self, output_size, sample_num=1, pad=32, is_binary=False):
+	def __init__(self, output_size, sample_num=1, pad=32, is_binary=False):
 		self.output_size = output_size
 		self.sample_num = sample_num
 		self.pad = pad
 		self.is_binary = is_binary
 
-  	def __call__(self, sample):
+	def __call__(self, sample):
 		image, label = sample['image'], sample['label']
 		assert image.shape == label.shape
 		if self.is_binary and label.max() > 1:
