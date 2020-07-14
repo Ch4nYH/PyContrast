@@ -28,7 +28,7 @@ class Logger(object):
 	def log(self, name, value):
 		self.logger.add_scalar(name, value, self.global_step)
 
-	def step(self, name):
+	def step(self):
 		self.global_step += 1
 
 	def close(self):
