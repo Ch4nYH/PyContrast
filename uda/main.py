@@ -38,12 +38,11 @@ def main():
 	puzzle_num = puzzle_config ** 3
 	feature_len = 256  #
 	iter_num = 0
-	n_class = 2
 	sr_feature_size = 32
 
 	train_loader, val_loader = build_dataloader(args)
 
-	model = VNet().cuda()
+	model = VNet(args.n_channels, args.n_classes).cuda()
 
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr)
 	scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)

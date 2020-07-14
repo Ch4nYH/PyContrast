@@ -11,6 +11,9 @@ def parse_args():
 	parser.add_argument('--epochs', type=int, default=100)
 	parser.add_argument('--batch-size', type=int, default=1)
 	parser.add_argument('--num-workers', type=int, default=8)
+	parser.add_argument('--n-classes', type=int, default=2)
+	parser.add_argument('--n-channels', type=int, default=1)
+
 	args = parser.parse_args()
 
 	return args
