@@ -7,7 +7,7 @@ from utils import dice, Logger, Saver
 from config import parse_args
 from datetime import datetime
 from functions import train, validate
-from dataset.paths import get_paths
+from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataloader
 
@@ -56,7 +56,7 @@ def main():
 	for epoch in range(args.start_epoch, args.epochs):
 		train(model, train_loader, optimizer, scheduler, logger, args, epoch)
 		validate(model, val_loader, optimizer, logger, saver, args, epoch)
-		
+
 
 if __name__ == '__main__':
 	main()
