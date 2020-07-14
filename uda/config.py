@@ -7,6 +7,8 @@ def parse_args():
 	parser.add_argument('--exp', type=str, help = "Name of experiments")
 	parser.add_argument('--lr', type=float, default = 1e-2)
 	parser.add_argument('--seed', type=int, default = 42)
+	parser.add_argument('--start-epoch', type=int, default=0)
+	parser.add_argument('--epochs', type=int, default=100)
 	args = parser.parse_args()
 
 	return args
