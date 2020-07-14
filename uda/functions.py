@@ -45,7 +45,7 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		logger.log("train/dice", d)
 		saver.save(epoch, {
 				'state_dict': model.state_dict(),
-				'dice': dice,
+				'dice': d,
 				'optimizer_state_dict': optimizer.state_dict()
-			}, dice)
+			}, d)
 
