@@ -40,8 +40,8 @@ class DatasetInstance(Dataset):
             sample = self.transform(sample_pre_transform)
             if self.two_crop:
                 sample2 = self.transform(sample_pre_transform)
-                sample['image_2'] = sample2['image_2']
-                sample['label_2'] = sample2['label_2']
+                sample['image_2'] = sample2['image']
+                sample['label_2'] = sample2['label']
         else:
             img = image
 
