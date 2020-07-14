@@ -107,7 +107,7 @@ class RandomRotate(object):
 
 
 class ToTensor(object):
-  """Convert ndarrays in sample to Tensors."""
+  	"""Convert ndarrays in sample to Tensors."""
 
 	def __call__(self, sample):
 		image, label = sample['image'], sample['label']
