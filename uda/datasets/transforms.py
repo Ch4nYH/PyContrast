@@ -1,6 +1,11 @@
+import copy
 import torch
+import random
 import torchvision
 import numpy as np
+
+np.random.seed(42)
+random.seed(42)
 
 class RandomCrop(object):
 	"""
