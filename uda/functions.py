@@ -24,7 +24,7 @@ def train(model, loader, optimizer, scheduler, logger, args, epoch, print_freq =
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		if i % print_freq == 0:
-			print('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
+			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
 
 		logger.log("train/loss", loss)
 		logger.log("train/dice", d)
@@ -32,7 +32,7 @@ def train(model, loader, optimizer, scheduler, logger, args, epoch, print_freq =
 		losses.append(loss.detach().cpu().item())
 		dices.append(d)
 		logger.step()
-	print("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
+	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
 	scheduler.step()
 
 def validate(model, loader, optimizer, logger, saver, args, epoch):
@@ -55,5 +55,5 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 				'dice': d,
 				'optimizer_state_dict': optimizer.state_dict()
 			}, d)
-	print("[Epoch {}] test avg dice: {}".format(epoch, sum(dices) / len(dices)))
+	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices) / len(dices)))
 
