@@ -16,7 +16,6 @@ class DatasetInstance(Dataset):
         self.image_list = [line for line in self.image_list if line.endswith('.h5')]
 
         self.root_dir = root_dir
-        self.read_label = read_label
         self.transform = transform
 
         self.two_crop = True
