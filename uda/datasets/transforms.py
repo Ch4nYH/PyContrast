@@ -1,4 +1,5 @@
-
+import torch
+import torchvision
 import numpy as np
 
 class RandomCrop(object):
@@ -121,12 +122,12 @@ class ToTensor(object):
 
 def build_transforms(args):
 
-	train_transforms = [RandomCrop(64, 8, pad=-1, is_binary=True),
+	train_transforms = torchvision.transforms([RandomCrop(64, 8, pad=-1, is_binary=True),
 					RandomTranspose(),
 					RandomRotate(),
-					ToTensor()]
-	test_transforms = [RandomCrop(64, 8, pad=48, is_binary=True),
-						ToTensor()]
+					ToTensor()])
+	test_transforms = torchvision.transforms([RandomCrop(64, 8, pad=48, is_binary=True),
+						ToTensor()])
 	return train_transforms, test_transforms
 
 def get_jigsaw_transforms(args):
