@@ -40,9 +40,9 @@ class Saver(object):
 		self.path = path
 		self.best_dice = 0
 		self.save_interval = save_interval
-	def save(self, epoch, states, dice):
+	def save(self, epoch, states, test_dice):
 		if epoch % self.save_interval == 0:
 			torch.save(states, os.path.join(self.path, 'model', 'checkpoint_{}.pth.tar'.format(epoch)))
-			if dice > self.best_dice:
+			if test_dice > self.best_dice:
 				torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))
-				self.best_dice = dice
+				self.best_dice = test_dice
