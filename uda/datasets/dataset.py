@@ -56,11 +56,9 @@ def build_dataloader(args):
 	train_root, train_list, test_root, test_list = get_paths(args.dataset)
 	train_transform, test_transform = get_transform(args)
 
-	train_dataset = DatasetInstance(train_list, train_root,
-                         transform=train_transform)
+	train_dataset = DatasetInstance(train_list, train_root, transform=train_transform)
 
-    test_dataset = DatasetInstance(test_list, test_root,
-                         transform=test_transform)
+    test_dataset = DatasetInstance(test_list, test_root, transform=test_transform)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, 
