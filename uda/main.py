@@ -27,8 +27,8 @@ def main():
 	now = datetime.now(dateutil.tz.tzlocal())
 	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
 	root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
-	os.mkdir(os.path.join(root_path, "log"))
-	os.mkdir(os.path.join(root_path, "model"))
+	os.mkdirs(os.path.join(root_path, "log"))
+	os.mkdirs(os.path.join(root_path, "model"))
 	
 	base_lr = args.lr  # base learning rate
 	batch_size = 1
