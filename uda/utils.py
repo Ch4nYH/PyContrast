@@ -21,7 +21,7 @@ def dice(x, y, eps=1e-7):
   return 2 * intersect / (x_sum + y_sum + eps)
 
 def adjust_learning_rate(args, optimizer, epoch):
-	for param_group in optimizer.param_groups():
+	for param_group in optimizer.param_groups:
 		param_group['lr'] = args.lr * math.pow(1.0 - (epoch / args.epochs), 0.9)
 
 class Logger(object):
