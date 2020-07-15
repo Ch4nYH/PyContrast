@@ -3,7 +3,7 @@ import torch
 from tqdm import tqdm
 from utils import cross_entropy_3d, dice
 
-def train(model, loader, optimizer, scheduler, logger, args, epoch, print_freq = 10):
+def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 	losses = []
 	dices = []
 	model.train()
@@ -33,7 +33,6 @@ def train(model, loader, optimizer, scheduler, logger, args, epoch, print_freq =
 		dices.append(d)
 		logger.step()
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
-	scheduler.step()
 
 def validate(model, loader, optimizer, logger, saver, args, epoch):
 	model.eval()

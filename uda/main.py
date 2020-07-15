@@ -4,7 +4,7 @@ import torch
 import dateutil.tz
 
 from tqdm import tqdm
-from utils import dice, Logger, Saver
+from utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
 from functions import train, validate
@@ -47,8 +47,8 @@ def main():
 
 	model = VNet(args.n_channels, args.n_classes).cuda()
 
-	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr)
-	scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
+	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
+	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 
 	model.train()
 
@@ -56,8 +56,9 @@ def main():
 	saver = Saver(root_path)
 
 	for epoch in tqdm(range(args.start_epoch, args.epochs)):
-		train(model, train_loader, optimizer, scheduler, logger, args, epoch)
+		train(model, train_loader, optimizer, logger, args, epoch)
 		validate(model, val_loader, optimizer, logger, saver, args, epoch)
+		adjust_learning_rate(args, optimizer, epoch)
 
 
 if __name__ == '__main__':
