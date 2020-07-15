@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .utils import Normalize, JigsawHead
 
 def passthrough(x, **kwargs):
     return x
@@ -127,10 +128,11 @@ class OutputTransition(nn.Module):
         return out
 
 
+
 class VNet(nn.Module):
     # the number of convolutions in each layer corresponds
     # to what is in the actual prototxt, not the intent
-    def __init__(self, n_channels, n_classes, elu=False):
+    def __init__(self, n_channels, n_classes, elu=False, pretrain = False, feat_dim=128, jigsaw = False):
         super(VNet, self).__init__()
         self.in_tr = InputTransition(n_channels, elu)
         self.down_tr32 = DownTransition(16, 1, elu)
@@ -142,6 +144,21 @@ class VNet(nn.Module):
         self.up_tr64 = UpTransition(128, 64, 1, elu)
         self.up_tr32 = UpTransition(64, 32, 1, elu)
         self.out_tr = OutputTransition(32, elu, n_classes)
+        self.pretrain = pretrain
+        self.jigsaw = jigsaw
+        if self.pretrain:
+            self.head = nn.Sequential(
+                nn.Linear(dim_in, dim_in),
+                nn.ReLU(inplace=True),
+                nn.Linear(dim_in, feat_dim),
+                Normalize(2)
+            )
+
+            if self.jigsaw:
+                self.head_jig = JigsawHead(dim_in=int(2048*self.width),
+                                   dim_out=feat_dim,
+                                   head="mlp")
+
 
     def forward(self, x):
         out16 = self.in_tr(x)
@@ -154,4 +171,21 @@ class VNet(nn.Module):
         out = self.up_tr64(out, out32)
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
-        return out
+        return out, out256
+
+    def encode(self, x):
+        out16 = self.in_tr(x)
+        out32 = self.down_tr32(out16)
+        out64 = self.down_tr64(out32)
+        out128 = self.down_tr128(out64)
+        out256 = self.down_tr256(out128)
+        return out256
+
+    def pretrain_forward(self, x, x_jig=None):
+        feat = self.head(self.encode(x))
+        if self.jigsaw:
+            feat_jig = self.head_jig(self.encode(x_jig))
+            return feat, feat_jig
+        else:
+            return feat
+        

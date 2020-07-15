@@ -14,7 +14,7 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
 
-		output = model(volume)
+		output, _ = model(volume)
 		loss = cross_entropy_3d(output, label)
 
 		optimizer.zero_grad()
@@ -55,4 +55,3 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 				'optimizer_state_dict': optimizer.state_dict()
 			}, d)
 	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices) / len(dices)))
-

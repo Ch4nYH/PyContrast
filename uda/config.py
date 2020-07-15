@@ -13,6 +13,8 @@ def parse_args():
 	parser.add_argument('--num-workers', type=int, default=8)
 	parser.add_argument('--n-classes', type=int, default=2)
 	parser.add_argument('--n-channels', type=int, default=1)
+	parser.add_argument('--print-freq', type=int, default=10)
+	parser.add_argument('--amp', action="store_true")
 
 	args = parser.parse_args()
 
