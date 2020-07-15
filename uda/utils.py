@@ -1,4 +1,5 @@
 import os
+import math
 import torch
 import shutil
 import tensorboardX
@@ -18,6 +19,10 @@ def dice(x, y, eps=1e-7):
   y_sum = np.sum(np.sum(np.sum(y)))
   x_sum = np.sum(np.sum(np.sum(x)))
   return 2 * intersect / (x_sum + y_sum + eps)
+
+def adjust_learning_rate(args, optimizer, epoch):
+	for param_group in optimizer.param_groups():
+		param_group['lr'] = args.lr * math.pow(1.0 - (epoch / args.epochs), 0.9)
 
 class Logger(object):
 
