@@ -46,8 +46,8 @@ def main():
 
 	train_loader, val_loader = build_dataloader(args)
 
-	model = VNet(args.n_channels, args.n_classes).cuda()
-	model_ema = VNet(args.n_channels, args.n_classes).cuda()
+	model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
+	model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 
