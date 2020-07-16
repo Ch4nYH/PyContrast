@@ -44,7 +44,7 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
 		label = label.squeeze(1)
-		output = model(volume)
+		output, _ = model(volume)
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		logger.log("train/dice", d)
