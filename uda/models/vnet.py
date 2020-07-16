@@ -148,14 +148,14 @@ class VNet(nn.Module):
         self.jigsaw = jigsaw
         if self.pretrain:
             self.head = nn.Sequential(
-                nn.Linear(dim_in, dim_in),
+                nn.Linear(2048, 2048),
                 nn.ReLU(inplace=True),
-                nn.Linear(dim_in, feat_dim),
+                nn.Linear(2048, feat_dim),
                 Normalize(2)
             )
 
             if self.jigsaw:
-                self.head_jig = JigsawHead(dim_in=int(2048*self.width),
+                self.head_jig = JigsawHead(dim_in=int(2048),
                                    dim_out=feat_dim,
                                    head="mlp")
 
