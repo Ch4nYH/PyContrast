@@ -22,8 +22,8 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		volume2 = batch['image_2'].cuda()
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
 
-		q = model(volume)
-		k = model_ema(volume)
+		q = model.pretrain_forward(volume)
+		k = model_ema.pretrain_forward(volume)
 
 		output = contrast(q, k, all_k=None)
 
@@ -73,8 +73,8 @@ def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast,
 		volume2 = batch['image_2'].cuda()
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
 
-		q = model(volume)
-		k = model_ema(volume)
+		q = model.pretrain_forward(volume)
+		k = model_ema.pretrain_forward(volume)
 
 		output = contrast(q, k, all_k=None)
 		losses, accuracies = compute_loss_accuracy(
