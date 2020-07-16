@@ -14,7 +14,7 @@ from datasets.dataset import build_dataloader
 
 from torch.utils.data import DataLoader
 from models.vnet import VNet
-from models.mem_moco import RGBMoco
+from models.mem_moco import RGBMoCo
 
 def main():
 
