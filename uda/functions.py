@@ -13,8 +13,6 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		volume = volume.view((-1,) + volume.shape[2:])
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
-		label = label.squeeze(1)
-		
 		output, _ = model(volume)
 		loss = cross_entropy_3d(output, label)
 
@@ -23,6 +21,7 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		optimizer.step()
 
 		pred = output.argmax(dim = 1)
+		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		if i % print_freq == 0:
 			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
@@ -45,7 +44,6 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
 		label = label.squeeze(1)
-
 		output = model(volume)
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
