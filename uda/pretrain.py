@@ -7,7 +7,7 @@ from tqdm import tqdm
 from utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
-from functions import train, validate
+from pretrain_functions import pretrain
 from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataloader
