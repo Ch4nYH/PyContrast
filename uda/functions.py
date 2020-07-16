@@ -13,7 +13,8 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		volume = volume.view((-1,) + volume.shape[2:])
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
-
+		label = label.squeeze(1)
+		
 		output, _ = model(volume)
 		loss = cross_entropy_3d(output, label)
 
@@ -43,6 +44,7 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		volume = volume.view((-1,) + volume.shape[2:])
 		label  = batch['label'].cuda()
 		label  = label.view((-1,) + label.shape[2:])
+		label = label.squeeze(1)
 
 		output = model(volume)
 		pred = output.argmax(dim = 1)
