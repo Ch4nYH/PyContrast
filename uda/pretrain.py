@@ -47,19 +47,17 @@ def main():
 	train_loader, val_loader = build_dataloader(args)
 
 	model = VNet(args.n_channels, args.n_classes).cuda()
-
+	model_ema = VNet(args.n_channels, args.n_classes).cuda()
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-
-	model.train()
 
 	logger = Logger(root_path)
 	saver = Saver(root_path)
 	contrast = RGBMoCo(1024)
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in tqdm(range(args.start_epoch, args.epochs)):
-		pretrain(model, train_loader, optimizer, logger, args, epoch, )
-		#validate(model, val_loader, optimizer, logger, saver, args, epoch)
+		pretrain(model, model_ema, train_loader, optimizer, logger, args, epoch, constrast, criterion)
+		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
 
 
