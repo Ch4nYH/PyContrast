@@ -72,8 +72,8 @@ def main():
 	contrast = RGBMoCo(128, K = 4096).cuda().half()
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in tqdm(range(args.start_epoch, args.epochs)):
-		pretrain(model, model_ema, train_loader, optimizer, logger, args, epoch, contrast, criterion)
-		validate(model, model_ema, contrast, criterion, val_loader, optimizer, logger, saver, args, epoch)
+		pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
+
 		adjust_learning_rate(args, optimizer, epoch)
 
 

@@ -9,56 +9,7 @@ try:
 except ImportError:
     pass
 
-
-def validate(model, model_ema, contrast, criterion, loader, optimizer, logger, saver, args, epoch):
-	model.eval()
-	model_ema.eval()
-	batch_time = AverageMeter()
-	data_time = AverageMeter()
-	loss_meter = AverageMeter()
-	acc_meter = AverageMeter()
-	loss_jig_meter = AverageMeter()
-	acc_jig_meter = AverageMeter()
-	with torch.no_grad():
-		for i, batch in enumerate(loader):
-			index = batch['index']
-			volume = batch['image'].cuda().half()
-			volume = volume.view((-1,) + volume.shape[2:])
-
-			volume2 = batch['image_2'].cuda().half()
-			volume2 = volume2.view((-1,) + volume2.shape[2:])
-
-			q = model.pretrain_forward(volume)
-			k = model_ema.pretrain_forward(volume)
-
-			output = contrast(q, k, all_k=None)
-			losses, accuracies = compute_loss_accuracy(
-						logits=output[:-1], target=output[-1],
-						criterion=criterion)
-
-			loss = losses[0]
-			update_loss = losses[0]
-			update_acc = accuracies[0]
-			update_loss_jig = torch.tensor([0.0])
-			update_acc_jig = torch.tensor([0.0])
-
-			loss_meter.update(update_loss.item(), args.batch_size)
-			loss_jig_meter.update(update_loss_jig.item(), args.batch_size)
-			acc_meter.update(update_acc[0], args.batch_size)
-			acc_jig_meter.update(update_acc_jig[0], args.batch_size)
-
-	saver.save(epoch, {
-		'state_dict': model.state_dict(),
-		'acc': acc_meter.avg,
-		'optimizer_state_dict': optimizer.state_dict(),
-		'amp': amp.state_dict() if args.amp else None
-	}, acc_meter.avg)
-
-	tqdm.write("[Epoch {}] test acc: {}, test jig acc".format(epoch, acc_meter.avg, acc_jig_meter.avg))
-
-
-
-def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast, criterion):
+def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion):
 	model.train()
 	model_ema.eval()
 
@@ -85,7 +36,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast,
 
 		q = model.pretrain_forward(volume)
 		with torch.no_grad():
-			k = model_ema.pretrain_forward(volume)
+			k = model_ema.pretrain_forward(volume2)
 
 		output = contrast(q, k, all_k=None)
 		losses, accuracies = compute_loss_accuracy(
@@ -125,7 +76,12 @@ def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast,
 		logger.log("pretrain/acc", update_acc[0])
 		logger.step()
 
-	tqdm.write("Train: [{}] avg loss: {}, avg acc: {}, avg jig acc:".format(epoch, acc_meter.avg, acc_jig_meter.avg))
+	saver.save(epoch, {
+		'state_dict': model.state_dict(),
+		'acc': acc_meter.avg,
+		'optimizer_state_dict': optimizer.state_dict(),
+		'amp': amp.state_dict() if args.amp else None
+	}, acc_meter.avg)
 
 def momentum_update(model, model_ema, m = 0.999):
         """ model_ema = m * model_ema + (1 - m) model """
