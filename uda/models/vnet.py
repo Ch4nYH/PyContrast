@@ -179,6 +179,7 @@ class VNet(nn.Module):
         out64 = self.down_tr64(out32)
         out128 = self.down_tr128(out64)
         out256 = self.down_tr256(out128)
+        print(out256.shape)
         return out256
 
     def pretrain_forward(self, x, x_jig=None):
