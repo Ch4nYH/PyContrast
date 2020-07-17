@@ -19,31 +19,30 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 	acc_meter = AverageMeter()
 	loss_jig_meter = AverageMeter()
 	acc_jig_meter = AverageMeter()
+	with torch.no_grad():
+		for i, batch in enumerate(loader):
+			index = batch['index']
+			volume = batch['image'].cuda()
+			volume = volume.view((-1,) + volume.shape[2:])
 
-	for i, batch in enumerate(loader):
-		index = batch['index']
-		volume = batch['image'].cuda()
-		volume = volume.view((-1,) + volume.shape[2:])
+			volume2 = batch['image_2'].cuda()
+			volume2 = volume2.view((-1,) + volume2.shape[2:])
 
-		volume2 = batch['image_2'].cuda()
-		volume2 = volume2.view((-1,) + volume2.shape[2:])
-
-		q = model.pretrain_forward(volume)
-		with torch.no_grad():
+			q = model.pretrain_forward(volume)
 			k = model_ema.pretrain_forward(volume)
 
-		output = contrast(q, k, all_k=None)
+			output = contrast(q, k, all_k=None)
 
-		loss = losses[0]
-		update_loss = losses[0]
-		update_acc = accuracies[0]
-		update_loss_jig = torch.tensor([0.0])
-		update_acc_jig = torch.tensor([0.0])
+			loss = losses[0]
+			update_loss = losses[0]
+			update_acc = accuracies[0]
+			update_loss_jig = torch.tensor([0.0])
+			update_acc_jig = torch.tensor([0.0])
 
-		loss_meter.update(update_loss.item(), args.batch_size)
-		loss_jig_meter.update(update_loss_jig.item(), args.batch_size)
-		acc_meter.update(update_acc[0], args.batch_size)
-		acc_jig_meter.update(update_acc_jig[0], args.batch_size)
+			loss_meter.update(update_loss.item(), args.batch_size)
+			loss_jig_meter.update(update_loss_jig.item(), args.batch_size)
+			acc_meter.update(update_acc[0], args.batch_size)
+			acc_jig_meter.update(update_acc_jig[0], args.batch_size)
 
 	saver.save(epoch, {
 		'state_dict': model.state_dict(),
@@ -82,7 +81,8 @@ def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast,
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
 
 		q = model.pretrain_forward(volume)
-		k = model_ema.pretrain_forward(volume)
+		with torch.no_grad():
+			k = model_ema.pretrain_forward(volume)
 
 		output = contrast(q, k, all_k=None)
 		losses, accuracies = compute_loss_accuracy(
