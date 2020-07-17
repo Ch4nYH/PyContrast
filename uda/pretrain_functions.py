@@ -10,7 +10,7 @@ except ImportError:
     pass
 
 
-def validate(model, model_ema, contrast, loader, optimizer, logger, saver, args, epoch):
+def validate(model, model_ema, contrast, criterion, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
 	model_ema.eval()
 	batch_time = AverageMeter()
