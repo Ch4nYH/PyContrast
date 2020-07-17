@@ -32,6 +32,9 @@ def validate(model, model_ema, contrast, loader, optimizer, logger, saver, args,
 			k = model_ema.pretrain_forward(volume)
 
 			output = contrast(q, k, all_k=None)
+			losses, accuracies = compute_loss_accuracy(
+						logits=output[:-1], target=output[-1],
+						criterion=criterion)
 
 			loss = losses[0]
 			update_loss = losses[0]
