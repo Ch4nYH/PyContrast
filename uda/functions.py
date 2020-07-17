@@ -3,6 +3,7 @@ import torch
 from tqdm import tqdm
 from utils import cross_entropy_3d, dice
 
+
 def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 	losses = []
 	dices = []

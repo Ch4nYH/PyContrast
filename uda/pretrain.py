@@ -7,7 +7,7 @@ from tqdm import tqdm
 from utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
-from pretrain_functions import pretrain
+from pretrain_functions import pretrain, moment
 from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataloader
@@ -15,6 +15,11 @@ from datasets.dataset import build_dataloader
 from torch.utils.data import DataLoader
 from models.vnet import VNet
 from models.mem_moco import RGBMoCo
+
+try:
+	from apex import amp, optimizers
+except ImportError:
+	pass
 
 def main():
 
@@ -50,6 +55,17 @@ def main():
 	model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
+
+	if args.amp:
+		model, optimizer = amp.initialize(
+			model, optimizer, opt_level=args.opt_level
+		)
+		model_ema = amp.initialize(
+			model_ema, opt_level=args.opt_level
+		)
+
+		model_ema.load_state_dict(model.state_dict())
+
 
 	logger = Logger(root_path)
 	saver = Saver(root_path)

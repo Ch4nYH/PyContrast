@@ -4,6 +4,12 @@ from tqdm import tqdm
 from utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
 from models import mem_moco
 
+try:
+    from apex import amp, optimizers
+except ImportError:
+    pass
+
+
 def validate(model, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
 	
@@ -41,7 +47,8 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 	saver.save(epoch, {
 		'state_dict': model.state_dict(),
 		'acc': acc_meter.avg,
-		'optimizer_state_dict': optimizer.state_dict()
+		'optimizer_state_dict': optimizer.state_dict(),
+		'amp': amp.state_dict() if args.amp else None
 	}, acc_meter.avg)
 
 	tqdm.write("[Epoch {}] test acc: {}, test jig acc".format(epoch, acc_meter.avg, acc_jig_meter.avg))
