@@ -10,9 +10,9 @@ except ImportError:
     pass
 
 
-def validate(model, loader, optimizer, logger, saver, args, epoch):
+def validate(model, model_ema, contrast, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
-	
+	model_ema.eval()
 	batch_time = AverageMeter()
 	data_time = AverageMeter()
 	loss_meter = AverageMeter()
@@ -22,10 +22,10 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 	with torch.no_grad():
 		for i, batch in enumerate(loader):
 			index = batch['index']
-			volume = batch['image'].cuda()
+			volume = batch['image'].cuda().half()
 			volume = volume.view((-1,) + volume.shape[2:])
 
-			volume2 = batch['image_2'].cuda()
+			volume2 = batch['image_2'].cuda().half()
 			volume2 = volume2.view((-1,) + volume2.shape[2:])
 
 			q = model.pretrain_forward(volume)
