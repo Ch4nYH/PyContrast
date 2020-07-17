@@ -51,13 +51,13 @@ def _make_nConv(nchan, depth, elu):
 class InputTransition(nn.Module):
     def __init__(self, inChans, elu, outChans=16):
         super().__init__()
-        self.conv = torch.nn.Sequential(
-            torch.nn.Conv3d(inChans, outChans, 3, padding=1),
-            ContBatchNorm3d(outChans),
+        self.conv = nn.Sequential(
+            nn.Conv3d(inChans, outChans, 3, padding=1),
+            nn.BatchNorm3d(outChans),
             ELUCons(elu, outChans),
 
-            torch.nn.Conv3d(outChans, outChans, 3, padding=1),
-            ContBatchNorm3d(outChans),
+            nn.Conv3d(outChans, outChans, 3, padding=1),
+            nn.BatchNorm3d(outChans),
             ELUCons(elu, outChans),
         )
 
