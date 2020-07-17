@@ -51,13 +51,13 @@ def _make_nConv(nchan, depth, elu):
 class InputTransition(nn.Module):
     def __init__(self, inChans, elu, outChans=16):
         super().__init__()
-        self.conv = nn.Sequential(
-            nn.Conv3d(inChans, outChans, 3, padding=1),
-            nn.BatchNorm3d(outChans),
+        self.conv = torch.nn.Sequential(
+            torch.nn.Conv3d(inChans, outChans, 3, padding=1),
+            ContBatchNorm3d(outChans),
             ELUCons(elu, outChans),
 
-            nn.Conv3d(outChans, outChans, 3, padding=1),
-            nn.BatchNorm3d(outChans),
+            torch.nn.Conv3d(outChans, outChans, 3, padding=1),
+            ContBatchNorm3d(outChans),
             ELUCons(elu, outChans),
         )
 
@@ -179,7 +179,9 @@ class VNet(nn.Module):
         out64 = self.down_tr64(out32)
         out128 = self.down_tr128(out64)
         out256 = self.down_tr256(out128)
-        print(out256.shape)
+        # out256: (8, 256, 4, 4, 4)
+        # TODO: if we need a pool here?
+        out256 = out256.view(out256.shape[0], -1)
         return out256
 
     def pretrain_forward(self, x, x_jig=None):
