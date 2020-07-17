@@ -74,10 +74,10 @@ def pretrain(model, model_ema, loader, optimizer, logger, args, epoch, contrast,
 
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
-		volume = batch['image'].cuda()
+		volume = batch['image'].cuda().half()
 		volume = volume.view((-1,) + volume.shape[2:])
 
-		volume2 = batch['image_2'].cuda()
+		volume2 = batch['image_2'].cuda().half()
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
 
 		q = model.pretrain_forward(volume)
