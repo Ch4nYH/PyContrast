@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 class JigsawHead(nn.Module):
     """Jigswa + linear + l2norm"""
