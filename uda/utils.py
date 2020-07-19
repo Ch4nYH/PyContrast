@@ -75,12 +75,12 @@ class Logger(object):
 
 class Saver(object):
 
-	def __init__(self, path, save_interval = 10):
+	def __init__(self, path, save_freq = 10):
 		self.path = path
 		self.best_dice = 0
-		self.save_interval = save_interval
+		self.save_freq = save_freq
 	def save(self, epoch, states, test_dice):
-		if epoch % self.save_interval == 0:
+		if epoch % self.save_freq == 0:
 			torch.save(states, os.path.join(self.path, 'model', 'checkpoint_{}.pth.tar'.format(epoch)))
 			if test_dice > self.best_dice:
 				torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))

@@ -14,6 +14,7 @@ def parse_args():
 	parser.add_argument('--n-classes', type=int, default=2)
 	parser.add_argument('--n-channels', type=int, default=1)
 	parser.add_argument('--print-freq', type=int, default=10)
+ 	parser.add_argument('--save-freq', type=int, default=100)
 	parser.add_argument('--amp', action="store_true")
 	parser.add_argument('--opt_level', type=str, default='O2',
                             choices=['O1', 'O2'])

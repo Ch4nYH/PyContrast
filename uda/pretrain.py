@@ -68,7 +68,7 @@ def main():
 
 
 	logger = Logger(root_path)
-	saver = Saver(root_path)
+	saver = Saver(root_path, save_freq = args.save_freq)
 	contrast = RGBMoCo(128, K = 4096).cuda().half()
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in tqdm(range(args.start_epoch, args.epochs)):
