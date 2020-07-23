@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 class HDF5Dataset(Dataset):
-  	""" JHU Dataset """
+	""" JHU Dataset """
 
   	def __init__(self, list_file, root_dir, transform=None, read_label=True, need_non_zero_label = True, is_binary = False):
 		"""
