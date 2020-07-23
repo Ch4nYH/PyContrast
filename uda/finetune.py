@@ -18,6 +18,7 @@ from models.vnet import VNet
 def main():
 
 	args = parse_args()
+	args.pretrain = False
 	os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 	print("Using GPU: {}".format(args.gpu))
 
