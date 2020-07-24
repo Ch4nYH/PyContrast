@@ -53,8 +53,8 @@ def main():
 
 	state_dict = model.state_dict()
 	pretrain_state_dict = torch.load(args.load_path)['state_dict']
-	
-	for k in pretrain_state_dict.keys():
+
+	for k in list(pretrain_state_dict.keys()):
 		if k not in state_dict:
 			del pretrain_state_dict[k]
 
