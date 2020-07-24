@@ -7,7 +7,7 @@ from tqdm import tqdm
 class HDF5Dataset(Dataset):
 	""" JHU Dataset """
 
-  	def __init__(self, list_file, root_dir, transform=None, read_label=True, need_non_zero_label = True, is_binary = False):
+	def __init__(self, list_file, root_dir, transform=None, read_label=True, need_non_zero_label = True, is_binary = False):
 		"""
 		Args:
 		  list_file (string) : List of the image files
