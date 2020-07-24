@@ -52,7 +52,12 @@ def main():
 	assert os.path.exists(args.load_path)
 
 	state_dict = model.state_dict()
-	state_dict.update(torch.load(args.load_path)['state_dict'])
+	pretrain_state_dict = torch.load(args.load_path)['state_dict']
+	
+	for k in pretrain_state_dict.keys():
+		if k not in state_dict:
+			del pretrain_state_dict[k]
+
 	model.load_state_dict(state_dict)
 	model.train()
 
