@@ -24,6 +24,7 @@ except ImportError:
 def main():
 
 	args = parse_args()
+	args.pretrain = True
 	os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 	print("Using GPU: {}".format(args.gpu))
 
