@@ -7,8 +7,8 @@ import numpy as np
 np.random.seed(42)
 random.seed(42)
 
-class RandomCropPatches(object):
-	def __init__(self, output_size, sample_num=1, pad=32, is_binary=False):
+class RandomCropSlices(object):
+	def __init__(self, output_size, sample_num=4, pad=32, is_binary=False):
 		self.output_size = output_size
 		self.sample_num = sample_num
 		self.pad = pad
@@ -38,13 +38,12 @@ class RandomCropPatches(object):
 		output_image = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
 		output_label = np.zeros((self.sample_num, self.output_size, self.output_size, self.output_size))
 		for i in range(self.sample_num):
-			if bbox[0][1] - self.output_size <= bbox[0][0]:
-				print(bbox[0])
-			w1 = np.random.randint(bbox[0][0], bbox[0][1] - self.output_size + 1)
+			#w1 = np.random.randint(bbox[0][0], bbox[0][1] - self.output_size + 1)
+			w = label.shape[0]
 			h1 = np.random.randint(bbox[1][0], bbox[1][1] - self.output_size + 1)
 			d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
-			output_image[i] = image[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
-			output_label[i] = label[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
+			output_image[i] = image[i * w / 4:(i + 1) * w / 4, h1:h1+self.output_size, d1:d1+self.output_size]
+			output_label[i] = label[i * w / 4:(i + 1) * w / 4, h1:h1+self.output_size, d1:d1+self.output_size]
 		return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
 
 
@@ -168,11 +167,11 @@ class ToTensor(object):
 
 def build_transforms(args):
 	if args.pretrain:
-		train_transforms = torchvision.transforms.Compose([RandomCrop(64, 1, pad=-1, is_binary=True),
-						RandomTranspose(),
+		train_transforms = torchvision.transforms.Compose([RandomCropSlices(256, 4, pad=-1, is_binary=True),
+						#RandomTranspose(),
 						RandomRotate(),
 						ToTensor()])
-		test_transforms = torchvision.transforms.Compose([RandomCrop(64, 1, pad=48, is_binary=True),
+		test_transforms = torchvision.transforms.Compose([RandomCropSlices(256, 4, pad=-1, is_binary=True),
 						ToTensor()])
 	else:
 		train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
