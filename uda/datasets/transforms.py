@@ -35,11 +35,11 @@ class RandomCropSlices(object):
 					[max(0, np.min(tempL[2]) - self.pad), min(label.shape[2], np.max(tempL[2]) + 1 + self.pad)]]
 
 		# crop random sample on whole image
-		output_image = np.zeros((self.sample_num, label.shape[0] // 4, self.output_size, self.output_size))
-		output_label = np.zeros((self.sample_num, label.shape[0] // 4, self.output_size, self.output_size))
+		output_image = np.zeros((self.sample_num, 64, self.output_size, self.output_size))
+		output_label = np.zeros((self.sample_num, 64, self.output_size, self.output_size))
 		for i in range(self.sample_num):
 			#w1 = np.random.randint(bbox[0][0], bbox[0][1] - self.output_size + 1)
-			w = label.shape[0]
+			w = 256
 			h1 = np.random.randint(bbox[1][0], bbox[1][1] - self.output_size + 1)
 			d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
 			output_image[i] = image[i * w // 4:i * w // 4 + label.shape[0] // 4, h1:h1+self.output_size, d1:d1+self.output_size]
