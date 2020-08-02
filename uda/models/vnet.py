@@ -148,7 +148,6 @@ class VNet(nn.Module):
         self.jigsaw = jigsaw
         if self.pretrain:
             self.head = nn.Sequential(
-                nn.MaxPool2d(2,2),
                 nn.Linear(input_size * input_size, input_size * input_size),
                 nn.ReLU(inplace=True),
                 nn.Linear(input_size * input_size, feat_dim),
@@ -182,6 +181,7 @@ class VNet(nn.Module):
         out256 = self.down_tr256(out128)
         # out256: (8, 256, 4, 4, 4)
         # TODO: if we need a pool here?
+        out256 = F.maxpool2d(out256, 2, stride = 2)
         out256 = out256.view(out256.shape[0], -1)
         return out256
 
