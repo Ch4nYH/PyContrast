@@ -181,7 +181,7 @@ class VNet(nn.Module):
         out256 = self.down_tr256(out128)
         # out256: (8, 256, 4, 4, 4)
         # TODO: if we need a pool here?
-        out256 = F.maxpool2d(out256, 2, stride = 2)
+        out256 = F.max_pool2d(out256, 2, stride = 2)
         out256 = out256.view(out256.shape[0], -1)
         return out256
 
