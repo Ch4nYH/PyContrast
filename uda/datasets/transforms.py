@@ -167,11 +167,11 @@ class ToTensor(object):
 
 def build_transforms(args):
 	if args.pretrain:
-		train_transforms = torchvision.transforms.Compose([RandomCropSlices(256, 4, pad=-1, is_binary=True),
+		train_transforms = torchvision.transforms.Compose([RandomCropSlices(128, 4, pad=-1, is_binary=True),
 						#RandomTranspose(),
 						RandomRotate(),
 						ToTensor()])
-		test_transforms = torchvision.transforms.Compose([RandomCropSlices(256, 4, pad=-1, is_binary=True),
+		test_transforms = torchvision.transforms.Compose([RandomCropSlices(128, 4, pad=-1, is_binary=True),
 						ToTensor()])
 	else:
 		train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
