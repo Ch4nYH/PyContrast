@@ -42,8 +42,8 @@ class RandomCropSlices(object):
 			w = label.shape[0]
 			h1 = np.random.randint(bbox[1][0], bbox[1][1] - self.output_size + 1)
 			d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
-			output_image[i] = image[i * w / 4:(i + 1) * w / 4, h1:h1+self.output_size, d1:d1+self.output_size]
-			output_label[i] = label[i * w / 4:(i + 1) * w / 4, h1:h1+self.output_size, d1:d1+self.output_size]
+			output_image[i] = image[i * w // 4:(i + 1) * w // 4, h1:h1+self.output_size, d1:d1+self.output_size]
+			output_label[i] = label[i * w // 4:(i + 1) * w // 4, h1:h1+self.output_size, d1:d1+self.output_size]
 		return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
 
 
