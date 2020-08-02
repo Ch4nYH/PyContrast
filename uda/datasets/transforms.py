@@ -148,7 +148,7 @@ class RandomRotate(object):
 
 	def _rotate(self, x, y):
 		degree = random.choice([0, 1, 2, 3])
-		x, y = np.rot90(x, degree, (0, 1)), np.rot90(y, degree, (0, 1))
+		x, y = np.rot90(x, degree, (1, 2)), np.rot90(y, degree, (1, 2))
 		return x, y
 
 
