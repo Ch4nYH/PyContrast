@@ -19,8 +19,8 @@ class RandomCropSlices(object):
 		assert image.shape == label.shape
 		if self.is_binary and label.max() > 1:
 			label[label > 1] = 0
-		if any(np.array(image.shape) <= self.output_size):
-			pad_x = max(0, self.output_size - image.shape[0] + 1)
+		if image.shape[0] < 256 or image.shape[1] < self.output_size or image.shape[2] < self.output_size: 
+			pad_x = max(0, 256 - image.shape[0] + 1)
 			pad_y = max(0, self.output_size - image.shape[1] + 1)
 			pad_z = max(0, self.output_size - image.shape[2] + 1)
 			image = np.pad(image, ((0, pad_x), (0, pad_y), (0, pad_z)), 'mean')
