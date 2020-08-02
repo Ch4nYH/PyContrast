@@ -148,9 +148,10 @@ class VNet(nn.Module):
         self.jigsaw = jigsaw
         if self.pretrain:
             self.head = nn.Sequential(
-                nn.Linear(4 * input_size * input_size, 4 * input_size * input_size),
+                nn.Maxpool2d(2,2),
+                nn.Linear(input_size * input_size, input_size * input_size),
                 nn.ReLU(inplace=True),
-                nn.Linear(4 * input_size * input_size, feat_dim),
+                nn.Linear(input_size * input_size, feat_dim),
                 Normalize(2)
             )
 
