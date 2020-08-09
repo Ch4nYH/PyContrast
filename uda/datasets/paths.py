@@ -1,7 +1,7 @@
 from os.path import join
 
 
-def get_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/'):
+def get_paths(dataset, root='/export/ccvl12b/datasets'):
     if dataset == 'synapse':
         root_dir = join(root, 'Synapse_pancreas/train_processed_noaug')
     elif dataset == 'synapse_aug':
@@ -31,7 +31,7 @@ def get_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/
     return root_dir, train_list, test_root, test_list
 
 
-def get_paths_multiorgan(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/'):
+def get_paths_multiorgan(dataset, root='/export/ccvl12b/datasets'):
     if dataset == 'synapse':
         root_dir = join(root, 'Synapse/train_processed_noaug')
     else:
@@ -46,7 +46,7 @@ def get_paths_multiorgan(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptatio
     return root_dir, train_list, test_root, test_list
 
 
-def get_test_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/'):
+def get_test_paths(dataset, root='/export/ccvl12b/datasets'):
     if dataset == 'synapse':
         root_dir = join(root, 'Synapse_pancreas/test')
     elif dataset == 'msd_spleen':
@@ -66,7 +66,7 @@ def get_test_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/data
     return root_dir, list_path
 
 
-def get_test_paths_multiorgan(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/'):
+def get_test_paths_multiorgan(dataset, root='/export/ccvl12b/datasets'):
     if dataset == 'synapse':
         root_dir = join(root, 'Synapse/test')
     elif dataset == 'msd_spleen':
