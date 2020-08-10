@@ -54,7 +54,7 @@ iter_num = 0
 sr_feature_size = 32
 
 train_dataset, val_dataset = build_dataset(args)
-train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, world_size = 2, rank = args.local_rank)
+train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = 2, rank = args.local_rank)
     
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
