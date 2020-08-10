@@ -51,11 +51,8 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		#loss = cross_entropy_3d(output, label)
 
 		optimizer.zero_grad()
-		if args.amp:
-			with amp.scale_loss(loss, optimizer) as scaled_loss:
-					scaled_loss.backward()
-		else:
-			loss.backward()
+		with amp.scale_loss(loss, optimizer) as scaled_loss:
+			scaled_loss.backward()
 		optimizer.step()
 
 		loss_meter.update(update_loss.item(), args.batch_size)
@@ -63,7 +60,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		acc_meter.update(update_acc[0], args.batch_size)
 		acc_jig_meter.update(update_acc_jig[0], args.batch_size)
 		momentum_update(model, model_ema)
-		if i % args.print_freq == 0:
+		if i % args.print_freq == 0 and gpu == 0:
 			tqdm.write('Train: [{0}][{1}/{2}]\t'
 						  'l_I {loss.val:.3f} ({loss.avg:.3f})\t'
 						  'a_I {acc.val:.3f} ({acc.avg:.3f})\t'
@@ -71,17 +68,17 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 						  'a_J {acc_jig.val:.3f} ({acc_jig.avg:.3f})'.format(
 						   epoch, i + 1, len(loader), loss=loss_meter, acc=acc_meter,
 						   loss_jig=loss_jig_meter, acc_jig=acc_jig_meter))
-
-		logger.log("pretrain/loss", update_loss.item())
-		logger.log("pretrain/acc", update_acc[0])
-		logger.step()
-
-	saver.save(epoch, {
-		'state_dict': model.state_dict(),
-		'acc': acc_meter.avg,
-		'optimizer_state_dict': optimizer.state_dict(),
-		'amp': amp.state_dict() if args.amp else None
-	}, acc_meter.avg)
+		if gpu == 0:
+			logger.log("pretrain/loss", update_loss.item())
+			logger.log("pretrain/acc", update_acc[0])
+			logger.step()
+	if gpu == 0:
+		saver.save(epoch, {
+			'state_dict': model.state_dict(),
+			'acc': acc_meter.avg,
+			'optimizer_state_dict': optimizer.state_dict(),
+			'amp': amp.state_dict() if args.amp else None
+		}, acc_meter.avg)
 
 def momentum_update(model, model_ema, m = 0.999):
         """ model_ema = m * model_ema + (1 - m) model """
