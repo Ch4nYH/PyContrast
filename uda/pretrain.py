@@ -61,15 +61,6 @@ def main():
 	feature_len = 256  #
 	iter_num = 0
 	sr_feature_size = 32
-
-	os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-	ngpus_per_node = torch.cuda.device_count()
-	args.world_size = ngpus_per_node * args.world_size
-	mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
- 
-	
- 
-
 	
 	train_loader, val_loader = build_dataloader(args)
 
