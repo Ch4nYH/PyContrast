@@ -9,7 +9,7 @@ try:
 except ImportError:
     pass
 
-def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion):
+def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, gpu):
 	model.train()
 	model_ema.eval()
 
@@ -28,10 +28,10 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
-		volume = batch['image'].cuda()
+		volume = batch['image'].cuda(gpu, non_blocking = True)
 		volume = volume.view((-1,) + volume.shape[2:])
 
-		volume2 = batch['image_2'].cuda()
+		volume2 = batch['image_2'].cuda(gpu, non_blocking = True)
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
 
 		q = model(volume)

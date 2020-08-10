@@ -29,8 +29,6 @@ args.pretrain = True
 
 args.world_size = len(args.gpu)
 os.environ['MASTER_PORT'] = args.port
-
-args.local_rank = 0
 torch.cuda.set_device(args.local_rank)
 torch.distributed.init_process_group(
 	'nccl',
@@ -68,8 +66,8 @@ train_loader = torch.utils.data.DataLoader(
 val_loader = torch.utils.data.DataLoader(
     val_dataset, batch_size=1, 
     num_workers=args.num_workers, pin_memory=True)
-model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
-model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
+model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda(args.local_rank, non_blocking = True)
+model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda(args.local_rank, non_blocking = True)
 
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
@@ -89,5 +87,6 @@ saver = Saver(root_path, save_freq = args.save_freq)
 contrast = RGBMoCo(128, K = 4096).cuda()
 criterion = torch.nn.CrossEntropyLoss()
 for epoch in tqdm(range(args.start_epoch, args.epochs)):
-	pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
+	train_sampler.set_epoch(epoch)
+	pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
 	adjust_learning_rate(args, optimizer, epoch)
