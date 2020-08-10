@@ -66,8 +66,8 @@ def main():
 
 	model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 	model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
-	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu)
-	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu)
+	
+	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 
@@ -81,7 +81,8 @@ def main():
 
 		model_ema.load_state_dict(model.state_dict())
 
-
+	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu)
+	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu)
 	logger = Logger(root_path)
 	saver = Saver(root_path, save_freq = args.save_freq)
 	contrast = RGBMoCo(128, K = 4096).cuda().half()
