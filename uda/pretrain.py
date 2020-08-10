@@ -43,7 +43,7 @@ if not os.path.exists(root_path):
 	os.mkdir(os.path.join(root_path, "model"))
 
 base_lr = args.lr  # base learning rate
-batch_size = 1
+batch_size = 2
 max_iterations = 40000
 cell_size = 96  # size of volume we crop patch from
 patch_size = 64
@@ -54,7 +54,7 @@ iter_num = 0
 sr_feature_size = 32
 
 train_dataset, val_dataset = build_dataset(args)
-train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, world_size = 2, rank = args.local_rank)
     
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
