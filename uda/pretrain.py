@@ -28,15 +28,15 @@ def main():
 
 	args = parse_args()
 	args.pretrain = True
-	gpu = args.gpu_ids
-	gpu_ids = args.gpu_ids.split(',')
-	args.gpu_ids = []
+	gpu = args.gpu
+	gpu_ids = args.gpu.split(',')
+	args.gpu = []
 	for gpu_id in gpu_ids:
 		id = int(gpu_id)
-		args.gpu_ids.append(id)
-	print(args.gpu_ids)
-	if len(args.gpu_ids) > 0:
-		torch.cuda.set_device(args.gpu_ids[0])
+		args.gpu.append(id)
+	print(args.gpu)
+	if len(args.gpu) > 0:
+		torch.cuda.set_device(args.gpu[0])
 	torch.manual_seed(args.seed)
 	torch.cuda.manual_seed(args.seed)
 
@@ -75,8 +75,8 @@ def main():
 
 	model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 	model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
-	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu_ids)
-	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu_ids)
+	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu)
+	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 
