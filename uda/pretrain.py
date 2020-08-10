@@ -16,6 +16,9 @@ from torch.utils.data import DataLoader
 from models.vnet import VNet
 from models.mem_moco import RGBMoCo
 
+import torch.utils.data.distributed
+import torch.multiprocessing as mp
+
 try:
 	from apex import amp, optimizers
 except ImportError:
@@ -25,12 +28,21 @@ def main():
 
 	args = parse_args()
 	args.pretrain = True
-	os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-	print("Using GPU: {}".format(args.gpu))
-
+	gpu = args.gpu_ids
+	gpu_ids = args.gpu_ids.split(',')
+	args.gpu_ids = []
+	for gpu_id in gpu_ids:
+		id = int(gpu_id)
+		args.gpu_ids.append(id)
+	print(args.gpu_ids)
+	if len(args.gpu_ids) > 0:
+		torch.cuda.set_device(args.gpu_ids[0])
 	torch.manual_seed(args.seed)
 	torch.cuda.manual_seed(args.seed)
 
+	os.environ['MASTER_PORT'] = args.port
+	torch.distributed.init_process_group(backend="nccl")
+ 
 	now = datetime.now(dateutil.tz.tzlocal())
 	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
 	root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
@@ -50,10 +62,21 @@ def main():
 	iter_num = 0
 	sr_feature_size = 32
 
+	os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+	ngpus_per_node = torch.cuda.device_count()
+	args.world_size = ngpus_per_node * args.world_size
+	mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+ 
+	
+ 
+
+	
 	train_loader, val_loader = build_dataloader(args)
 
 	model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 	model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
+	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu_ids)
+	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu_ids)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 
