@@ -18,7 +18,7 @@ from models.mem_moco import RGBMoCo
 
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
-
+from apex.parallel import DistributedDataParallel as DDP
 try:
 	from apex import amp, optimizers
 except ImportError:
@@ -81,8 +81,8 @@ def main():
 
 		model_ema.load_state_dict(model.state_dict())
 
-	model = torch.nn.parallel.DistributedDataParallel(model, device_ids=args.gpu)
-	model_ema = torch.nn.parallel.DistributedDataParallel(model_ema, device_ids=args.gpu)
+	model = DDP(model)
+	model_ema = DDP(model_ema)
 	logger = Logger(root_path)
 	saver = Saver(root_path, save_freq = args.save_freq)
 	contrast = RGBMoCo(128, K = 4096).cuda().half()
