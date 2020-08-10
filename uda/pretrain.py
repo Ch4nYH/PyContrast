@@ -27,7 +27,6 @@ except ImportError:
 args = parse_args()
 args.pretrain = True
 
-args.world_size = len(args.gpu)
 os.environ['MASTER_PORT'] = args.port
 torch.cuda.set_device(args.local_rank)
 torch.distributed.init_process_group(
