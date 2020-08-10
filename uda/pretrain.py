@@ -85,7 +85,7 @@ def main():
 	model_ema = DDP(model_ema)
 	logger = Logger(root_path)
 	saver = Saver(root_path, save_freq = args.save_freq)
-	contrast = RGBMoCo(128, K = 4096).cuda().half()
+	contrast = RGBMoCo(128, K = 4096).cuda()
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in tqdm(range(args.start_epoch, args.epochs)):
 		pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
