@@ -65,8 +65,8 @@ train_loader = torch.utils.data.DataLoader(
     sampler = train_sampler,
     num_workers=args.num_workers, pin_memory=True)
     
-test_loader = torch.utils.data.DataLoader(
-    test_dataset, batch_size=1, 
+val_loader = torch.utils.data.DataLoader(
+    val_dataset, batch_size=1, 
     num_workers=args.num_workers, pin_memory=True)
 model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
