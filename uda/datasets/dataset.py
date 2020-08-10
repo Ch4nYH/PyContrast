@@ -59,11 +59,14 @@ def build_dataloader(args):
     train_dataset = DatasetInstance(train_list, train_root, transform=train_transform)
 
     test_dataset = DatasetInstance(test_list, test_root, transform=test_transform)
-
+    train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+    
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, 
-        shuffle=True,
+        shuffle=False,
+        sampler = train_sampler,
         num_workers=args.num_workers, pin_memory=True)
+    
     test_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1, 
         num_workers=args.num_workers, pin_memory=True)
