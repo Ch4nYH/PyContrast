@@ -71,21 +71,20 @@ model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda(args.loc
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-if args.amp:
-	model, optimizer = amp.initialize(
-		model, optimizer, opt_level=args.opt_level
-	)
-	model_ema = amp.initialize(
-		model_ema, opt_level=args.opt_level
-	)
-	model_ema.load_state_dict(model.state_dict())
+model, optimizer = amp.initialize(
+	model, optimizer, opt_level=args.opt_level
+)
+model_ema = amp.initialize(
+	model_ema, opt_level=args.opt_level
+)
+model_ema.load_state_dict(model.state_dict())
 model = DDP(model)
 model_ema = DDP(model_ema)
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
 contrast = RGBMoCo(128, K = 4096).cuda()
 criterion = torch.nn.CrossEntropyLoss()
-for epoch in tqdm(range(args.start_epoch, args.epochs)):
+for epoch in range(args.start_epoch, args.epochs):
 	train_sampler.set_epoch(epoch)
 	pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
 	adjust_learning_rate(args, optimizer, epoch)
