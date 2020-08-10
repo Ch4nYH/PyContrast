@@ -158,9 +158,7 @@ class VNet(nn.Module):
                 self.head_jig = JigsawHead(dim_in=int(16384),
                                    dim_out=feat_dim,
                                    head="mlp")
-
-
-    def forward(self, x):
+    def normal_forward(self, x):
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
         out64 = self.down_tr64(out32)
@@ -172,6 +170,12 @@ class VNet(nn.Module):
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
         return out, out256
+
+    def forward(self, x):
+        if self.pretrain:
+            return self.pretrain_forward(x)
+        else:
+            return self.normal_forward(x)
 
     def encode(self, x):
         out16 = self.in_tr(x)
