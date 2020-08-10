@@ -52,22 +52,12 @@ class DatasetInstance(Dataset):
         sample['index'] = index
         return sample
 
-def build_dataloader(args):
+def build_dataset(args):
     train_root, train_list, test_root, test_list = get_paths(args.dataset)
     train_transform, test_transform = build_transforms(args)
 
     train_dataset = DatasetInstance(train_list, train_root, transform=train_transform)
 
     test_dataset = DatasetInstance(test_list, test_root, transform=test_transform)
-    train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
     
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, 
-        shuffle=False,
-        sampler = train_sampler,
-        num_workers=args.num_workers, pin_memory=True)
-    
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1, 
-        num_workers=args.num_workers, pin_memory=True)
-    return train_loader, test_loader
+    return train_dataset, test_dataset

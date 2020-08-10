@@ -10,7 +10,7 @@ from datetime import datetime
 from pretrain_functions import pretrain, momentum_update
 from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
-from datasets.dataset import build_dataset
+from datasets.dataset import build_dataloader
 
 from torch.utils.data import DataLoader
 from models.vnet import VNet
@@ -26,24 +26,25 @@ except ImportError:
 
 args = parse_args()
 args.pretrain = True
+gpu = args.gpu
+gpu_ids = args.gpu.split(',')
+args.gpu = []
+for gpu_id in gpu_ids:
+	id = int(gpu_id)
+	args.gpu.append(id)
+print(args.gpu)
+if len(args.gpu_ids) > 0:
+   torch.cuda.set_device(args.gpu_ids[0])
 
-args.world_size = len(args.gpu)
 os.environ['MASTER_PORT'] = args.port
+torch.distributed.init_process_group(backend="nccl")
 
-args.local_rank = 0
-torch.cuda.set_device(args.local_rank)
-torch.distributed.init_process_group(
-	'nccl',
-    init_method='env://'
-)
-device = torch.device('cuda:{}'.format(args.local_rank))
 now = datetime.now(dateutil.tz.tzlocal())
 timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
 root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
 os.mkdir(root_path)
 os.mkdir(os.path.join(root_path, "log"))
 os.mkdir(os.path.join(root_path, "model"))
-
 base_lr = args.lr  # base learning rate
 batch_size = 1
 max_iterations = 40000
@@ -55,18 +56,7 @@ feature_len = 256  #
 iter_num = 0
 sr_feature_size = 32
 
-train_dataset, val_dataset = build_dataset(args)
-train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-    
-train_loader = torch.utils.data.DataLoader(
-    train_dataset, batch_size=args.batch_size, 
-    shuffle=False,
-    sampler = train_sampler,
-    num_workers=args.num_workers, pin_memory=True)
-    
-test_loader = torch.utils.data.DataLoader(
-    test_dataset, batch_size=1, 
-    num_workers=args.num_workers, pin_memory=True)
+train_loader, val_loader = build_dataloader(args)
 model = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda()
 
