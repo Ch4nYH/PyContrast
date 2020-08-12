@@ -74,7 +74,7 @@ def main():
 	assert os.path.exists(args.load_path)
 
 	state_dict = model.state_dict()
-	pretrain_state_dict = torch.load(args.load_path)['state_dict']
+	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
 
 	for k in list(pretrain_state_dict.keys()):
 		if k not in state_dict:
