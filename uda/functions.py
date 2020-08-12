@@ -8,7 +8,7 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 	losses = []
 	dices = []
 	model.train()
-	for i, batch in enumerate(tqdm(loader)):
+	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda(args.local_rank)
 		volume = volume.view((-1,) + volume.shape[2:])

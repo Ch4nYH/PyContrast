@@ -88,7 +88,7 @@ def main():
 	logger = Logger(root_path)
 	saver = Saver(root_path)
 
-	for epoch in tqdm(range(args.start_epoch, args.epochs)):
+	for epoch in range(args.start_epoch, args.epochs):
 		train(model, train_loader, optimizer, logger, args, epoch)
 		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
