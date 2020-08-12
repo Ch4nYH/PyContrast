@@ -63,7 +63,7 @@ def main():
 	val_loader = torch.utils.data.DataLoader(
 		val_dataset, batch_size=1, 
 		num_workers=args.num_workers, pin_memory=True)
-	model = VNet(args.n_channels, args.n_classes).cuda()
+	model = VNet(args.n_channels, args.n_classes).cuda(args.local_rank)
 	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
