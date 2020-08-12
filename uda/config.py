@@ -15,7 +15,7 @@ def parse_args():
 	parser.add_argument('--print-freq', type=int, default=10)
 	parser.add_argument('--save-freq', type=int, default=100)
 	parser.add_argument('--amp', action="store_true")
-	parser.add_argument('--opt_level', type=str, default='O2',
+	parser.add_argument('--opt_level', type=str, default='O1',
                             choices=['O1', 'O2'])
 
 	parser.add_argument('--load-path', type=str, default=None)
