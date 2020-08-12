@@ -53,8 +53,16 @@ def main():
 	sr_feature_size = 32
 
 	train_dataset, val_dataset = build_dataset(args)
-	rain_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = 2, rank = args.local_rank)
-
+	train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = 2, rank = args.local_rank)
+	train_loader = torch.utils.data.DataLoader(
+		train_dataset, batch_size=args.batch_size, 
+		shuffle=False,
+		sampler = train_sampler,
+		num_workers=args.num_workers, pin_memory=True)
+    
+	val_loader = torch.utils.data.DataLoader(
+		val_dataset, batch_size=1, 
+		num_workers=args.num_workers, pin_memory=True)
 	model = VNet(args.n_channels, args.n_classes).cuda()
 	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
