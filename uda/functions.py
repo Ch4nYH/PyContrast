@@ -24,14 +24,14 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		pred = output.argmax(dim = 1)
 		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
+ 		dices.append(d)
+		losses.append(loss)
+		losses.append(loss.detach().cpu().item())
 		if i % print_freq == 0 and args.local_rank == 0:
 			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
 
 			logger.log("train/loss", loss)
 			logger.log("train/dice", d)
-			dices.append(d)
-			losses.append(loss)
-			losses.append(loss.detach().cpu().item())
 			logger.step()
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
 
@@ -48,9 +48,9 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		output, _ = model(volume)
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
+  		dices.append(d)
 		if args.local_rank == 0:
 			logger.log("train/dice", d)
-			dices.append(d)
 			saver.save(epoch, {
 					'state_dict': model.state_dict(),
 					'dice': d,
