@@ -59,7 +59,7 @@ def main():
 	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
- 	model, optimizer = amp.initialize(
+	model, optimizer = amp.initialize(
 		model, optimizer, opt_level=args.opt_level
 	)
 	model = DDP(model)
