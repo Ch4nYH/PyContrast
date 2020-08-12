@@ -10,9 +10,9 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 	model.train()
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
-		volume = batch['image'].cuda()
+		volume = batch['image'].cuda(args.local_rank)
 		volume = volume.view((-1,) + volume.shape[2:])
-		label  = batch['label'].cuda()
+		label  = batch['label'].cuda(args.local_rank)
 		label  = label.view((-1,) + label.shape[2:])
 		output, _ = model(volume)
 		loss = cross_entropy_3d(output, label)
@@ -24,15 +24,14 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 		pred = output.argmax(dim = 1)
 		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
-		if i % print_freq == 0:
+		if i % print_freq == 0 and args.local_rank == 0:
 			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
 
-		logger.log("train/loss", loss)
-		logger.log("train/dice", d)
+			logger.log("train/loss", loss)
+			logger.log("train/dice", d)
 
-		losses.append(loss.detach().cpu().item())
-		dices.append(d)
-		logger.step()
+			losses.append(loss.detach().cpu().item())
+			logger.step()
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
 
 def validate(model, loader, optimizer, logger, saver, args, epoch):
@@ -48,11 +47,12 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		output, _ = model(volume)
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
-		logger.log("train/dice", d)
-		dices.append(d)
-		saver.save(epoch, {
-				'state_dict': model.state_dict(),
-				'dice': d,
-				'optimizer_state_dict': optimizer.state_dict()
-			}, d)
+		if args.local_rank == 0:
+			logger.log("train/dice", d)
+			dices.append(d)
+			saver.save(epoch, {
+					'state_dict': model.state_dict(),
+					'dice': d,
+					'optimizer_state_dict': optimizer.state_dict()
+				}, d)
 	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices) / len(dices)))
