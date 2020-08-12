@@ -29,7 +29,8 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 
 			logger.log("train/loss", loss)
 			logger.log("train/dice", d)
-
+			dices.append(d)
+			losses.append(loss)
 			losses.append(loss.detach().cpu().item())
 			logger.step()
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
