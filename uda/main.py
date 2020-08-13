@@ -71,7 +71,6 @@ def main():
 		model, optimizer, opt_level=args.opt_level
 	)
 	model = DDP(model)
-	assert os.path.exists(args.load_path)
  
 	model.train()
 	print("Loaded weights")
