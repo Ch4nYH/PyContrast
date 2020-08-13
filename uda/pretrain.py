@@ -18,14 +18,8 @@ from models.mem_moco import RGBMoCo
 
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
-
-try:
-	from apex import amp, optimizers
-	from apex.parallel import DistributedDataParallel as DDP
-	apex = True
-except ImportError:
-	from torch.nn.parallel import DistributedDataParallel as DDP
-	apex = False
+from torch.nn.parallel import DistributedDataParallel as DDP
+apex = False
 
 args = parse_args()
 args.pretrain = True
