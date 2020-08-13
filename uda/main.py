@@ -21,7 +21,7 @@ try:
 	from apex.parallel import DistributedDataParallel as DDP
 	apex = True
 except ImportError:
-    import torch.nn.parallel.DistributedDataParallel as DDP
+    from torch.nn.parallel import DistributedDataParallel as DDP
     apex = False
 def main():
 
