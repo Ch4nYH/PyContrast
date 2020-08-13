@@ -190,9 +190,9 @@ class VNet(nn.Module):
         return out256
 
     def pretrain_forward(self, x, x_jig=None):
-        print(x.shape)
+        #print(x.shape)
         x = self.encode(x)
-        print(x.shape)
+        #print(x.shape)
         feat = self.head(x)
         if self.jigsaw:
             feat_jig = self.head_jig(self.encode(x_jig))
