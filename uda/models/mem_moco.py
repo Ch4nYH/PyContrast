@@ -45,7 +45,7 @@ class BaseMoCo(nn.Module):
         newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
         all_length = neg.shape[1]
         for i in range(neg.shape[0]):
-            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i // 4, all_length, 4)))]
+            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
 
         out = torch.cat((pos, neg), dim=1)
         out = torch.div(out, self.T)
