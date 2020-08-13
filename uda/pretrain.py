@@ -18,11 +18,14 @@ from models.mem_moco import RGBMoCo
 
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
-from apex.parallel import DistributedDataParallel as DDP
+
 try:
 	from apex import amp, optimizers
+	from apex.parallel import DistributedDataParallel as DDP
+	apex = True
 except ImportError:
-	pass
+	from torch.nn.parallel import DistributedDataParallel as DDP
+	apex = False
 
 args = parse_args()
 args.pretrain = True
@@ -71,15 +74,19 @@ model_ema = VNet(args.n_channels, args.n_classes, pretrain = True).cuda(args.loc
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-model, optimizer = amp.initialize(
-	model, optimizer, opt_level=args.opt_level
-)
-model_ema = amp.initialize(
-	model_ema, opt_level=args.opt_level
-)
-model_ema.load_state_dict(model.state_dict())
-model = DDP(model)
-model_ema = DDP(model_ema)
+if apex:
+	model, optimizer = amp.initialize(
+		model, optimizer, opt_level=args.opt_level
+	)
+	model_ema = amp.initialize(
+		model_ema, opt_level=args.opt_level
+	)
+	model_ema.load_state_dict(model.state_dict())
+	model = DDP(model)
+	model_ema = DDP(model_ema)
+else:
+	model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
+	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank)
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
 contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
