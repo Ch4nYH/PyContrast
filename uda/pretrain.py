@@ -74,20 +74,9 @@ model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = Tr
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-if apex:
-	model, optimizer = amp.initialize(
-		model, optimizer, opt_level=args.opt_level
-	)
-	model_ema = amp.initialize(
-		model_ema, opt_level=args.opt_level
-	)
-	model_ema.load_state_dict(model.state_dict())
-	model = DDP(model)
-	model_ema = DDP(model_ema)
-else:
-	model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
-	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank)
-	model_ema.load_state_dict(model.state_dict())
+model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+model_ema.load_state_dict(model.state_dict())
 print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
