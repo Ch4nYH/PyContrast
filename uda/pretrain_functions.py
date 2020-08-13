@@ -25,7 +25,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		if classname.find('BatchNorm') != -1:
 			m.train()
 	model_ema.apply(set_bn_train)
-
+	scaler = torch.cuda.amp.GradScaler() 
 	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda(gpu, non_blocking = True)
@@ -33,15 +33,16 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 
 		volume2 = batch['image_2'].cuda(gpu, non_blocking = True)
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
+  
+		with torch.cuda.amp.autocast(): 
+			q = model(volume)
+			with torch.no_grad():
+				k = model_ema(volume2)
 
-		q = model(volume)
-		with torch.no_grad():
-			k = model_ema(volume2)
-
-		output = contrast(q, k, all_k=None)
-		losses, accuracies = compute_loss_accuracy(
-						logits=output[:-1], target=output[-1],
-						criterion=criterion)
+			output = contrast(q, k, all_k=None)
+			losses, accuracies = compute_loss_accuracy(
+							logits=output[:-1], target=output[-1],
+							criterion=criterion)
 		loss = losses[0]
 		update_loss = losses[0]
 		update_acc = accuracies[0]
@@ -51,9 +52,9 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		#loss = cross_entropy_3d(output, label)
 
 		optimizer.zero_grad()
-		with amp.scale_loss(loss, optimizer) as scaled_loss:
-			scaled_loss.backward()
-		optimizer.step()
+		scaler.scale(loss).backward() 
+		scaler.step(optimizer)
+		scaler.update() 
 
 		loss_meter.update(update_loss.item(), args.batch_size)
 		loss_jig_meter.update(update_loss_jig.item(), args.batch_size)
