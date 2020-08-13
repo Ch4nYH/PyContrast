@@ -15,11 +15,14 @@ from datasets.dataset import build_dataset
 from torch.utils.data import DataLoader
 from models.vnet import VNet
 
-from apex.parallel import DistributedDataParallel as DDP
+
 try:
 	from apex import amp, optimizers
+	from apex.parallel import DistributedDataParallel as DDP
+	apex = True
 except ImportError:
-	pass
+    import torch.nn.parallel.DistributedDataParallel as DDP
+    apex = False
 def main():
 
 	args = parse_args()
@@ -67,9 +70,10 @@ def main():
 	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-	model, optimizer = amp.initialize(
-		model, optimizer, opt_level=args.opt_level
-	)
+	if apex:
+		model, optimizer = amp.initialize(
+			model, optimizer, opt_level=args.opt_level
+		)
 	model = DDP(model)
  
 	model.train()
