@@ -57,7 +57,7 @@ iter_num = 0
 sr_feature_size = 32
 
 train_dataset, val_dataset = build_dataset(args)
-train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = 2, rank = args.local_rank)
+train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
     
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
@@ -87,6 +87,7 @@ if apex:
 else:
 	model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
 	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank)
+	model_ema.load_state_dict(model.state_dict())
 print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
