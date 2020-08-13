@@ -63,7 +63,7 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
     shuffle=False,
     sampler = train_sampler,
-    num_workers=args.num_workers, pin_memory=True)
+    num_workers=args.num_workers, pin_memory=True, drop_last = True)
     
 val_loader = torch.utils.data.DataLoader(
     val_dataset, batch_size=1, 
@@ -87,6 +87,7 @@ if apex:
 else:
 	model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
 	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank)
+print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
 contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
