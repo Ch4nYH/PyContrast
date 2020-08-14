@@ -28,12 +28,7 @@ def main():
 	args = parse_args()
 	args.pretrain = False
 	print("Using GPU: {}".format(args.local_rank))
-	os.environ['MASTER_PORT'] = args.port
-	torch.cuda.set_device(args.local_rank)
-	torch.distributed.init_process_group(
-		'nccl'
-	)
-	device = torch.device('cuda:{}'.format(args.local_rank))
+	
 	now = datetime.now(dateutil.tz.tzlocal())
 	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
 	root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
@@ -57,6 +52,12 @@ def main():
 	train_dataset, val_dataset = build_dataset(args)
 	args.world_size = len(args.gpu.split(","))
 	if args.world_size > 1:
+		os.environ['MASTER_PORT'] = args.port
+		torch.cuda.set_device(args.local_rank)
+		torch.distributed.init_process_group(
+			'nccl'
+		)
+		device = torch.device('cuda:{}'.format(args.local_rank))
 		train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
 	else:
 		train_sampler = None
