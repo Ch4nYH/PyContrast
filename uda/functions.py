@@ -35,9 +35,9 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 			logger.step()
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
 
-def validate(model, loader, optimizer, logger, saver, args, epoch):
 	model.eval()
 	dices = []
+def validate(model, loader, optimizer, logger, saver, args, epoch):
 	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda()
