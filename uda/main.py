@@ -70,7 +70,7 @@ def main():
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
  
-	model = DDP(model)
+	model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
  
 	model.train()
 	print("Loaded weights")
