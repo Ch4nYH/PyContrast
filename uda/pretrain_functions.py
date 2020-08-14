@@ -78,7 +78,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 			'state_dict': model.state_dict(),
 			'acc': acc_meter.avg,
 			'optimizer_state_dict': optimizer.state_dict(),
-			'amp': amp.state_dict() if args.amp else None
+			#'amp': amp.state_dict() if args.amp else None
 		}, acc_meter.avg)
 
 def momentum_update(model, model_ema, m = 0.999):
