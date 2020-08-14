@@ -53,7 +53,7 @@ class DatasetInstance(Dataset):
         return sample
 
 def build_dataset(args):
-    train_root, train_list, test_root, test_list = get_paths(args.dataset)
+    train_root, train_list, test_root, test_list = get_paths(args.dataset, args.data_root)
     train_transform, test_transform = build_transforms(args)
 
     train_dataset = DatasetInstance(train_list, train_root, transform=train_transform)
