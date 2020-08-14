@@ -51,7 +51,7 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		dices.append(d)
 		if args.local_rank == 0:
-			logger.log("train/dice", d)
+			logger.log("test/dice", d)
 			saver.save(epoch, {
 					'state_dict': model.state_dict(),
 					'dice': d,
