@@ -31,8 +31,7 @@ def main():
 	os.environ['MASTER_PORT'] = args.port
 	torch.cuda.set_device(args.local_rank)
 	torch.distributed.init_process_group(
-		'nccl',
-		init_method='env://'
+		'nccl'
 	)
 	device = torch.device('cuda:{}'.format(args.local_rank))
 	now = datetime.now(dateutil.tz.tzlocal())
@@ -70,10 +69,7 @@ def main():
 	
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-	if apex:
-		model, optimizer = amp.initialize(
-			model, optimizer, opt_level=args.opt_level
-		)
+ 
 	model = DDP(model)
  
 	model.train()
