@@ -33,7 +33,7 @@ root_dir, list_path = get_test_paths(args.dataset)
 stride = 20
 n_class = 2
 
-votesave_path = os.path.join(snapshot_root, 'votemap', os.path.basename(snapshot_path))
+votesave_path = os.path.join('votemap')
 os.makedirs(votesave_path, exist_ok=True)
 
 patch_size = 64
