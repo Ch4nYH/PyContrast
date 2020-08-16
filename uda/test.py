@@ -21,6 +21,8 @@ parser.add_argument('--gpu', type=str, default='0', help='GPU to be used')
 parser.add_argument('--method', type=str, default='vote', help='testing method to be used, max or vote')
 parser.add_argument('--lambda_pe', type=float, default=0.0, help='position encoding weight')
 parser.add_argument('--load-path', type=str)
+parser.add_argument('--n-classes', type=int, default=2)
+parser.add_argument('--n-channels', type=int, default=1)
 args = parser.parse_args()
 
 classes = ['Pancreas']
