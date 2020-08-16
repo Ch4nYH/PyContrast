@@ -10,6 +10,8 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from utils import load_data_test, dice, visualize, construct_PE
 from datasets.paths import get_test_paths
+from models.vnet import VNet
+from collections import OrderedDict
 
 parser = argparse.ArgumentParser(description='Testing VNet.')
 parser.add_argument('--dataset', type=str, default='msd_pancreas', help='The dataset to be trained')
@@ -18,27 +20,18 @@ parser.add_argument('--exp', type=int, default=1, help='index of experiment')
 parser.add_argument('--gpu', type=str, default='0', help='GPU to be used')
 parser.add_argument('--method', type=str, default='vote', help='testing method to be used, max or vote')
 parser.add_argument('--lambda_pe', type=float, default=0.0, help='position encoding weight')
-parser.add_argument('--torch')
+parser.add_argument('--load-path', type=str)
 args = parser.parse_args()
 
 classes = ['Pancreas']
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 print('processing dataset {}'.format(args.dataset))
 
-snapshot_root = 'exps/exp{}'.format(args.exp)
-
 root_dir, list_path = get_test_paths(args.dataset)
 
-pretrainmodel = None
 
 stride = 20
 n_class = 2
-
-snapshot_prefix = 'VNET'
-snapshot_path = snapshot_root + '/' + snapshot_prefix + '_iteration_{}'.format(args.iter)
-if not os.path.isfile(snapshot_path) and args.iter == 80000:
-    args.iter = 40000
-    snapshot_path = snapshot_root + '/' + snapshot_prefix + '_iteration_{}'.format(args.iter)
 
 votesave_path = os.path.join(snapshot_root, 'votemap', os.path.basename(snapshot_path))
 os.makedirs(votesave_path, exist_ok=True)
@@ -46,9 +39,9 @@ os.makedirs(votesave_path, exist_ok=True)
 patch_size = 64
 
 if __name__ == "__main__":
-    net = torch.load(snapshot_path)
-    net.cuda()
-    net.eval()
+    net = VNet(args.n_channels, args.n_classes).cuda()
+    #net = torch.load(snapshot_path)
+    
     dices = []
     dice_for_cases = []
     case_list = []
@@ -56,7 +49,16 @@ if __name__ == "__main__":
 
     # read the list path from the cross validation
     image_list = open(list_path).readlines()
-
+    assert os.path.exists(args.load_path)
+    state_dict = torch.load(args.load_path, map_location="cpu")
+    new_state_dict = OrderedDict()
+    for key in state_dict.keys():
+        new_state_dict[key[7:]] = state_dict[key]
+    
+    net.load_state_dict(new_state_dict)
+    net.cuda()
+    net.eval()
+    
     # test passed for the first case
     for i in range(0, len(image_list)):
         file_name = image_list[i].strip('\n')
