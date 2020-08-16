@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # read the list path from the cross validation
     image_list = open(list_path).readlines()
     assert os.path.exists(args.load_path)
-    state_dict = torch.load(args.load_path, map_location="cpu")
+    state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
     new_state_dict = OrderedDict()
     for key in state_dict.keys():
         new_state_dict[key[7:]] = state_dict[key]
