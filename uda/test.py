@@ -151,8 +151,8 @@ if __name__ == "__main__":
     dices.append(mean_dice)
 
     print('saving volumes to {}'.format(
-        os.path.join(snapshot_root, '{}_{}.csv'.format(args.dataset, os.path.basename(snapshot_path)))))
+        os.path.join('votemap', '{}.csv'.format(args.dataset))))
     pd.DataFrame(data={'name': case_list, 'dsc': dices}).to_csv(
-        os.path.join(snapshot_root, '{}_{}.csv'.format(args.dataset, os.path.basename(snapshot_path))), index=False)
+        os.path.join('votemap', '{}.csv'.format(args.dataset)), index=False)
 
     print('Average DSC: {:.5f}'.format(mean_dice))
