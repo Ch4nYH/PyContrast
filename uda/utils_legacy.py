@@ -102,10 +102,10 @@ def color_map(N=256, normalized=False):
 
 def adjust_opt(optAlg, optimizer, init_lr, iter_num, max_iterations, power=0.9):
 	if optAlg == 'sgd':
-	  lr = init_lr * math.pow(1.0 - (iter_num / max_iterations), power)
+		lr = init_lr * math.pow(1.0 - (iter_num / max_iterations), power)
 
-	  for param_group in optimizer.param_groups:
-		param_group['lr'] = lr
+		for param_group in optimizer.param_groups:
+			param_group['lr'] = lr
 
 
 def visualize(im, vote_map, label, n_class=9, ratio=1.0):
@@ -177,18 +177,18 @@ def load_state_dict(net, state_dict, remove='', add=''):
 	for param in own_state.items():
 		name = add + param[0].replace(remove, '')
 		if name not in state_dict:
-		print('{} not in pretrained model'.format(param[0]))
+			print('{} not in pretrained model'.format(param[0]))
 	for name, param in state_dict.items():
 		if remove + name.replace(add, '') not in own_state:
-		print('skipping {}'.format(name))
+			print('skipping {}'.format(name))
 		continue
 		if isinstance(param, Parameter):
 		# backwards compatibility for serialized parameters
-		param = param.data
+			param = param.data
 		if param.shape == own_state[remove + name.replace(add, '')].shape:
-		own_state[remove + name.replace(add, '')].copy_(param)
+			own_state[remove + name.replace(add, '')].copy_(param)
 		else:
-		print('skipping {} because of shape inconsistency'.format(name))
+			print('skipping {} because of shape inconsistency'.format(name))
 
 
 def dice(x, y, eps=1e-7):
