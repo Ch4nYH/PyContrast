@@ -175,7 +175,7 @@ def build_transforms(args):
 		train_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
 						#RandomTranspose(),
 						RandomRotate(),
-						GuassianNoise(),
+						GaussianNoise(),
 						ToTensor()])
 		test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
 						ToTensor()])
