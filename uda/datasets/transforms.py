@@ -8,7 +8,7 @@ np.random.seed(42)
 random.seed(42)
 
 class RandomCropSlices(object):
-	def __init__(self, output_size, sample_num=4, pad=32, is_binary=False):
+	def __init__(self, output_size, sample_num=4, pad=32, is_binary=True):
 		self.output_size = output_size
 		self.sample_num = sample_num
 		self.pad = pad
@@ -151,6 +151,11 @@ class RandomRotate(object):
 		x, y = np.rot90(x, degree, (1, 2)), np.rot90(y, degree, (1, 2))
 		return x, y
 
+class GaussianNoise(object):
+    def __call__(self, sample):
+        image, label = sample['image'], sample['label']
+        image += torch.randn(*image.size()) / 5
+        return {'image': image, 'label': label}
 
 class ToTensor(object):
 	"""Convert ndarrays in sample to Tensors."""
@@ -170,6 +175,7 @@ def build_transforms(args):
 		train_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
 						#RandomTranspose(),
 						RandomRotate(),
+						GuassianNoise(),
 						ToTensor()])
 		test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
 						ToTensor()])
