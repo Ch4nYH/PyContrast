@@ -154,7 +154,7 @@ class RandomRotate(object):
 class GaussianNoise(object):
     def __call__(self, sample):
         image, label = sample['image'], sample['label']
-        image += torch.randn(*image.size()) / 5
+        image += torch.randn(image.shape) / 5
         return {'image': image, 'label': label}
 
 class ToTensor(object):
