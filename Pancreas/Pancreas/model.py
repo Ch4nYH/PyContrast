@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as from django.conf import settings
+import torch.nn.functional as F
 def passthrough(x, **kwargs):
     return x
 
