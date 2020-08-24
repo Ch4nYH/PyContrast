@@ -55,7 +55,7 @@ f = open(save_list_path, 'w')
 img_dir = os.path.join(data_path, 'raw/')
 for idx in range(1,83):
     path = os.path.join(img_dir, "%03d.npy.h5" % idx)
-    image, label, image_list, label_list = load_data(image_path, label_path)
+    image, label, image_list, label_list = load_data(path)
 
     for i in range(rand_num):
         image_save_path = os.path.join(save_path, str(idx) + '_' + str(i) + '.npz')
