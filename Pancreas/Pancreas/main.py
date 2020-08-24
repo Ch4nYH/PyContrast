@@ -19,7 +19,7 @@ test_data_path = '/export/ccvl12b/datasets/nih_pancreas/test'
 
 test_list_path = './lists/test_fd0'
 
-snapshot_path = '' # where to save your models
+snapshot_path = 'models/'
 snapshot_prefix = 'vnet_fd' + str(current_fold)
 if not os.path.exists(snapshot_path):
   os.mkdir(snapshot_path)
