@@ -12,15 +12,15 @@ save_list_path = 'train.list' # where to save your training lists
 pad = [32, 32, 32] # ROI padding
 rand_num = 16 # controls how many we sample from whole CT images , currently we adopt foreground: background = 1:1
 
-min_val = -100
-max_val = 240
+min_val = 0
+max_val = 255
 
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 
 def load_data(path):
     data = h5py.File(path, 'r')
-    image = np.array(data['image']).astype(np.float32)
+    image = np.array(data['raw']).astype(np.float32)
     label = np.array(data['label'])
 
     image[image < min_val] = min_val
@@ -52,8 +52,8 @@ def load_data(path):
     return image, label, image_list, label_list
 
 f = open(save_list_path, 'w')
-
-for idx in range(21,83):
+img_dir = os.path.join(data_path, 'raw/')
+for idx in range(1,83):
     path = os.path.join(img_dir, "%03d.npy.h5" % idx)
     image, label, image_list, label_list = load_data(image_path, label_path)
 
