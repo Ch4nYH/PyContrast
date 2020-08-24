@@ -13,11 +13,11 @@ import numpy as np
 
 current_fold = 0
 
-list_path = '/export/ccvl12b/datasets/nih_pancreas/train_processed_aug.lst'
-train_data_path = '/export/ccvl12b/datasets/nih_pancreas/train_processed_aug/'
-test_data_path = '/export/ccvl12b/datasets/nih_pancreas/test_processed/'
+list_path = './lists/train_fd0.list'
+train_data_path = '/export/ccvl12b/datasets/nih_pancreas/nih_pad32/'
+test_data_path = '/export/ccvl12b/datasets/nih_pancreas/test'
 
-test_list_path = '/export/ccvl12b/datasets/nih_pancreas/test.lst'
+test_list_path = './lists/test_fd0'
 
 snapshot_path = '' # where to save your models
 snapshot_prefix = 'vnet_fd' + str(current_fold)
@@ -80,8 +80,9 @@ if __name__ == "__main__":
         print("#############################################")
         dices = []
         for filename in open(test_list_path).readlines():
-            data = h5py.File(os.path.join(test_data_path, '{}.npy.h5'.format(filename)), 'r')
-            image = np.array(data['image'])
+            idx = int(filename.split('.')[0])
+            data = h5py.File(os.path.join(test_data_path, '%03d.npy' % idx), 'r')
+            image = np.array(data['raw']).astype('float') / 255.0
             label = np.array(data['label'])
             
             w, h, d = image.shape
