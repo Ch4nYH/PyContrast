@@ -31,8 +31,8 @@ def main():
 	
 	now = datetime.now(dateutil.tz.tzlocal())
 	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
-	root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
-	if not os.path.exists(root_path):
+	root_path = 'exps/exp_{}'.format(args.exp, timestamp)
+	if args.local_rank == 0:
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))
 		os.mkdir(os.path.join(root_path, "model"))
