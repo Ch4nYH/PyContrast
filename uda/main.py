@@ -39,7 +39,7 @@ def main():
 	
 	base_lr = args.lr  # base learning rate
 	batch_size = 1
-	max_iterations = 40000
+	max_iterations = 20000
 
 	cell_size = 96  # size of volume we crop patch from
 	patch_size = 64
