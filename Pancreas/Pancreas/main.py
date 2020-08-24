@@ -32,7 +32,7 @@ stride = 32 # sliding window testing stride
 base_lr = 1e-2 # base learning rate
 
 if __name__ == "__main__":
-    net = VNet().cuda()
+    net = VNet(1024).cuda()
     
     if sys.argv[2] == 'train':
         net_parallel = nn.DataParallel(net)
