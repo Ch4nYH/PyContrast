@@ -29,9 +29,8 @@ def main():
 	args.pretrain = False
 	print("Using GPU: {}".format(args.local_rank))
 	
-	now = datetime.now(dateutil.tz.tzlocal())
-	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
-	root_path = 'exps/exp{}_{}'.format(args.exp, timestamp)
+	root_path = 'exps/exp_{}'.format(args.exp)
+ 
 	if not os.path.exists(root_path):
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))

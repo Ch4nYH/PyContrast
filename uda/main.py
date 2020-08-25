@@ -28,10 +28,7 @@ def main():
 	args = parse_args()
 	args.pretrain = False
 	print("Using GPU: {}".format(args.local_rank))
-	
-	now = datetime.now(dateutil.tz.tzlocal())
-	timestamp = now.strftime('%Y_%m_%d_%H_%M_%S')
-	root_path = 'exps/exp_{}'.format(args.exp, timestamp)
+	root_path = 'exps/exp_{}'.format(args.exp)
 	if args.local_rank == 0:
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))
