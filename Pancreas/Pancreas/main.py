@@ -82,7 +82,7 @@ if __name__ == "__main__":
         dices = []
         for filename in open(test_list_path).readlines():
             idx = int(filename.split('.')[0])
-            data = h5py.File(os.path.join(test_data_path, '%03d.npy' % idx), 'r')
+            data = h5py.File(os.path.join(test_data_path, '%03d.npy.h5' % idx), 'r')
             image = np.array(data['raw']).astype('float') / 255.0
             label = np.array(data['label'])
             
