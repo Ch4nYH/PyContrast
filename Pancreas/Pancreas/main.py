@@ -10,6 +10,7 @@ from model import VNet # import your model here
 from utils import dice, dice_loss
 from data import DataLoader, NIHDataset, RandomCrop, ToTensor
 import numpy as np
+import h5py
 
 current_fold = 0
 
