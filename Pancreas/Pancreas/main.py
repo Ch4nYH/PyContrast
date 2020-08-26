@@ -17,7 +17,7 @@ list_path = './lists/train_fd0.list'
 train_data_path = '/export/ccvl12b/datasets/nih_pancreas/nih_pad32/'
 test_data_path = '/export/ccvl12b/datasets/nih_pancreas/test'
 
-test_list_path = './lists/test_fd0'
+test_list_path = './lists/test_fd0.list'
 
 snapshot_path = 'models/'
 snapshot_prefix = 'vnet_fd' + str(current_fold)
