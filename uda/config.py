@@ -37,6 +37,8 @@ def parse_args():
 	parser.add_argument("--local_rank", type=int, default=0)
 	parser.add_argument("--port", type=str, default="15000")
 	parser.add_argument("--data-root", default="/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets")
+	parser.add_argument("--train-list", default=None, type=str)
+
 	args = parser.parse_args()
 
 	return args

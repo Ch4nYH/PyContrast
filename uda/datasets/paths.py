@@ -1,7 +1,7 @@
 from os.path import join
 
 
-def get_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets'):
+def get_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets', train_list = None):
     if dataset == 'synapse':
         root_dir = join(root, 'Synapse_pancreas/train_processed_noaug')
     elif dataset == 'synapse_aug':
@@ -20,10 +20,12 @@ def get_paths(dataset, root='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets'
 
     print('processing dataset {}'.format(dataset))
     if dataset == 'synapse':
-        train_list = join(root_dir, '../train.lst')
+        if train_list is None:
+            train_list = join(root_dir, '../train.lst')
         test_root = root_dir.replace('train_processed_noaug', 'test_processed')
     else:
-        train_list = join(root_dir, '../train_processed_aug.lst')
+        if train_list is None:
+            train_list = join(root_dir, '../train_processed_aug.lst')
         test_root = root_dir.replace('train_processed_aug', 'test_processed')
 
     test_list = join(root_dir, '../test.lst')
