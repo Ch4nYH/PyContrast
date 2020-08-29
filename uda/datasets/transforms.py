@@ -4,6 +4,8 @@ import random
 import torchvision
 import numpy as np
 
+from scipy.ndimage.filters import gaussian_filter, gaussian_gradient_magnitude
+
 np.random.seed(42)
 random.seed(42)
 
@@ -169,6 +171,41 @@ class ToTensor(object):
 		label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
 		return {'image': image, 'label': label}
 
+def get_range_val(value, rnd_type="uniform"):
+    if isinstance(value, (list, tuple, np.ndarray)):
+        if len(value) == 2:
+            if value[0] == value[1]:
+                n_val = value[0]
+            else:
+                orig_type = type(value[0])
+                if rnd_type == "uniform":
+                    n_val = random.uniform(value[0], value[1])
+                elif rnd_type == "normal":
+                    n_val = random.normalvariate(value[0], value[1])
+                n_val = orig_type(n_val)
+        elif len(value) == 1:
+            n_val = value[0]
+        else:
+            raise RuntimeError("value must be either a single vlaue or a list/tuple of len 2")
+        return n_val
+    else:
+        return value
+    
+class GaussianBlur(object):
+    def __init__(self, sigma_range=(1, 5), per_channel = True, p_per_channel = 1):
+        self.sigma_range = sigma_range
+        self.per_channel = per_channel
+        self.p_per_channel = p_per_channel
+    def __call__(self, sample):
+		image, label = sample['image'], sample['label']
+		if not self.per_channel:
+			sigma = get_range_val(self.sigma_range)
+		for c in range(image.shape[0]):
+			if np.random.uniform() <= p_per_channel:
+				if self.per_channel:
+					sigma = get_range_val(sigma_range)
+				image[c] = gaussian_filter(image[c], sigma, order=0)
+		return {'image': image, 'label': label}
 
 def build_transforms(args):
 	if args.pretrain:
@@ -176,6 +213,7 @@ def build_transforms(args):
 						#RandomTranspose(),
 						RandomRotate(),
 						GaussianNoise(),
+						GaussianBlur(),
 						ToTensor()])
 		test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
 						ToTensor()])
@@ -183,6 +221,8 @@ def build_transforms(args):
 		train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
 						RandomTranspose(),
 						RandomRotate(),
+						GaussianNoise(),
+						GaussianBlur(),
 						ToTensor()])
 		test_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=48, is_binary=True),
 						ToTensor()])
