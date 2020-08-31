@@ -29,7 +29,7 @@ def main():
 	args.pretrain = False
 	print("Using GPU: {}".format(args.local_rank))
 	root_path = 'exps/exp_{}'.format(args.exp)
-	if args.local_rank == 0:
+	if args.local_rank == 0 and not os.path.exists(root_path):
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))
 		os.mkdir(os.path.join(root_path, "model"))
