@@ -201,7 +201,7 @@ class GaussianBlur(object):
         if not self.per_channel:
             sigma = get_range_val(self.sigma_range)
         for c in range(image.shape[0]):
-            if np.random.uniform() <= p_per_channel:
+            if np.random.uniform() <= self.p_per_channel:
                 if self.per_channel:
                     sigma = get_range_val(sigma_range)
                 image[c] = gaussian_filter(image[c], sigma, order=0)
