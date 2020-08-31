@@ -4,11 +4,6 @@ from tqdm import tqdm
 from utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
 from models import mem_moco
 
-try:
-    from apex import amp, optimizers
-except ImportError:
-    pass
-
 def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, gpu):
 	model.train()
 	model_ema.eval()
