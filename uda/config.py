@@ -38,7 +38,8 @@ def parse_args():
 	parser.add_argument("--port", type=str, default="15000")
 	parser.add_argument("--data-root", default="/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets")
 	parser.add_argument("--train-list", default=None, type=str)
-
+	parser.add_argument("--ssim", action="store_true", default=False)	
+ 
 	args = parser.parse_args()
 
 	return args

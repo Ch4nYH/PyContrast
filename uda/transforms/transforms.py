@@ -46,7 +46,7 @@ class RandomCropSlices(object):
             d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
             output_image[i] = image[i * w // 4:i * w // 4 + w // 4, h1:h1+self.output_size, d1:d1+self.output_size]
             output_label[i] = label[i * w // 4:i * w // 4 + w // 4, h1:h1+self.output_size, d1:d1+self.output_size]
-        return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
+        return {'image': output_image, 'label': output_label, 'cropped_image': output_image}
 
 
 class RandomCrop(object):
@@ -157,7 +157,12 @@ class GaussianNoise(object):
     def __call__(self, sample):
         image, label = sample['image'], sample['label']
         image += np.random.randn(*image.shape) / 5
-        return {'image': image, 'label': label}
+        sample['image'] = image
+        sample['label'] = label
+        for key in sample:
+            if key not in ['image', 'label']:
+                sample[key] = copy.deepcopy(sample[key])
+        return sample
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
@@ -205,7 +210,13 @@ class GaussianBlur(object):
                 if self.per_channel:
                     sigma = get_range_val(self.sigma_range)
                 image[c] = gaussian_filter(image[c], sigma, order=0)
-        return {'image': image, 'label': label}
+                
+        sample['image'] = image
+        sample['label'] = label
+        for key in sample:
+            if key not in ['image', 'label']:
+                sample[key] = copy.deepcopy(sample[key])
+        return sample
 
 def build_transforms(args):
     if args.pretrain:
