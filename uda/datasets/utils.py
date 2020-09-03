@@ -167,8 +167,15 @@ def ssim(
     Returns:
         torch.Tensor: ssim results
     """
+    X = torch.Tensor(X)
+    Y = torch.Tensor(Y)
+    
     if not X.shape == Y.shape:
         raise ValueError("Input images should have the same dimensions.")
+
+    for d in range(len(X.shape) - 1, 1, -1):
+        X = X.squeeze(dim=d)
+        Y = Y.squeeze(dim=d)
 
     if len(X.shape) not in (4, 5):
         raise ValueError(f"Input images should be 4-d or 5-d tensors, but got {X.shape}")
@@ -214,8 +221,15 @@ def ms_ssim(
     Returns:
         torch.Tensor: ms-ssim results
     """
+    X = torch.Tensor(X)
+    Y = torch.Tensor(Y)
+    
     if not X.shape == Y.shape:
         raise ValueError("Input images should have the same dimensions.")
+
+    for d in range(len(X.shape) - 1, 1, -1):
+        X = X.squeeze(dim=d)
+        Y = Y.squeeze(dim=d)
 
     if not X.type() == Y.type():
         raise ValueError("Input images should have the same dtype.")
