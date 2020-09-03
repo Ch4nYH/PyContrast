@@ -93,7 +93,7 @@ class RandomCrop(object):
             d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
             output_image[i] = image[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
             output_label[i] = label[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
-        return {'image': output_image, 'label': output_label, 'ori_image': copy.deepcopy(image)}
+        return {'image': output_image, 'label': output_label, 'cropped_image': copy.deepcopy(image)}
 
 
 class RandomTranspose(object):
@@ -115,9 +115,6 @@ class RandomTranspose(object):
 
         sample['image'] = image
         sample['label'] = label
-        for key in sample:
-            if key not in ['image', 'label']:
-                sample[key] = copy.deepcopy(sample[key])
         return sample
 
     def _trans(self, image, label):
@@ -143,9 +140,6 @@ class RandomRotate(object):
 
         sample['image'] = image
         sample['label'] = label
-        for key in sample:
-            if key not in ['image', 'label']:
-                sample[key] = copy.deepcopy(sample[key])
         return sample
 
     def _rotate(self, x, y):
@@ -159,9 +153,6 @@ class GaussianNoise(object):
         image += np.random.randn(*image.shape) / 5
         sample['image'] = image
         sample['label'] = label
-        for key in sample:
-            if key not in ['image', 'label']:
-                sample[key] = copy.deepcopy(sample[key])
         return sample
 
 class ToTensor(object):
@@ -174,7 +165,11 @@ class ToTensor(object):
         else:
             image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
         label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
-        return {'image': image, 'label': label}
+        
+        sample['image'] = image
+        sample['label'] = label
+
+        return sample
 
 def get_range_val(value, rnd_type="uniform"):
     if isinstance(value, (list, tuple, np.ndarray)):
@@ -213,9 +208,6 @@ class GaussianBlur(object):
                 
         sample['image'] = image
         sample['label'] = label
-        for key in sample:
-            if key not in ['image', 'label']:
-                sample[key] = copy.deepcopy(sample[key])
         return sample
 
 def build_transforms(args):
