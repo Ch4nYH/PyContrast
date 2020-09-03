@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 
 from .paths import get_paths
 from .transforms.transforms import build_transforms
-from ..utils.ssim import ssim
+from .utils import ssim
 
 
 class DatasetInstanceWithSSIM(DatasetInstance):
