@@ -1,8 +1,8 @@
 import torch
 
 from tqdm import tqdm
-from utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
-from models import mem_moco
+from utils.utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
+from models.mem_moco import mem_moco
 
 def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, gpu):
 	model.train()
