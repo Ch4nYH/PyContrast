@@ -140,7 +140,6 @@ class RandomRotate(object):
 
         sample['image'] = image
         sample['label'] = label
-        print(sample.keys())
         return sample
 
     def _rotate(self, x, y):
@@ -154,8 +153,6 @@ class GaussianNoise(object):
         image += np.random.randn(*image.shape) / 5
         sample['image'] = image
         sample['label'] = label
-
-        print(sample.keys())
         return sample
 
 class ToTensor(object):
@@ -171,7 +168,7 @@ class ToTensor(object):
         
         sample['image'] = image
         sample['label'] = label
-        print(sample.keys())
+
         return sample
 
 def get_range_val(value, rnd_type="uniform"):
@@ -211,8 +208,6 @@ class GaussianBlur(object):
                 
         sample['image'] = image
         sample['label'] = label
-        
-        print(sample.keys())
         return sample
 
 def build_transforms(args):

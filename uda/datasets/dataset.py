@@ -57,10 +57,11 @@ class DatasetInstance(Dataset):
 
 class DatasetInstanceWithSSIM(DatasetInstance):
     def __init__(self, list_file, root_dir, transform=None, 
-        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=10):
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=10, split='train'):
         super(DatasetInstanceWithSSIM, self).__init__(list_file, root_dir, transform, 
         need_non_zero_label, is_binary, jigsaw_transform)
         self.num_of_samples = num_of_samples
+        self.split = split
     def __getitem__(self, index):
         img_name = os.path.join(self.root_dir, self.image_list[index])
         data = h5py.File(img_name, 'r')
@@ -77,7 +78,7 @@ class DatasetInstanceWithSSIM(DatasetInstance):
             if self.two_crop:
                 new_samples = [self.transform(sample_pre_transform) for _ in range(self.num_of_samples)]
                 for new_sample in new_samples:
-                    sample_ssim = ssim(sample['cropped_imgae'], new_sample['cropped_image'])
+                    sample_ssim = ssim(sample['cropped_image'], new_sample['cropped_image'])
                     if sample_ssim > best_ssim:
                         best_ssim = sample_ssim
                         best_sample = new_sample
