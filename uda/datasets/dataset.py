@@ -10,45 +10,7 @@ from .transforms.transforms import build_transforms
 from .utils import ssim
 
 
-class DatasetInstanceWithSSIM(DatasetInstance):
-    def __init__(self, list_file, root_dir, transform=None, 
-        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=10):
-        super(DatasetInstanceWithSSIM, self).__init__(list_file, root_dir, transform, 
-        need_non_zero_label, is_binary, jigsaw_transform)
-        self.num_of_samples = num_of_samples
-    def __getitem__(self, index):
-        img_name = os.path.join(self.root_dir, self.image_list[index])
-        data = h5py.File(img_name, 'r')
-        image = np.array(data['image'], dtype=np.float32) 
-        label = np.array(data['label'])
-        
-        data.close()
-        sample_pre_transform = {'image': image, 'label': label}
 
-        if self.transform is not None:
-            sample = self.transform(sample_pre_transform)
-            best_ssim = 0
-            best_sample = None
-            if self.two_crop:
-                new_samples = [self.transform(sample_pre_transform) for _ in range(self.num_of_samples)]
-                for new_sample in new_samples:
-                    sample_ssim = ssim(sample['cropped_imgae'], new_sample['cropped_image'])
-                    if sample_ssim > best_ssim:
-                        best_ssim = sample_ssim
-                        best_sample = new_sample
-                
-            sample['image_2'] = best_sample['image']
-            sample['label_2'] = best_sample['label']
-        else:
-            img = image
-
-        if self.use_jigsaw:
-             jigsaw_img = self.jigsaw_transform(sample_pre_transform)
-
-
-        sample['index'] = index
-        return sample
-    
 class DatasetInstance(Dataset):
 
     def __init__(self, list_file, root_dir, transform=None, 
@@ -93,6 +55,46 @@ class DatasetInstance(Dataset):
         sample['index'] = index
         return sample
 
+class DatasetInstanceWithSSIM(DatasetInstance):
+    def __init__(self, list_file, root_dir, transform=None, 
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=10):
+        super(DatasetInstanceWithSSIM, self).__init__(list_file, root_dir, transform, 
+        need_non_zero_label, is_binary, jigsaw_transform)
+        self.num_of_samples = num_of_samples
+    def __getitem__(self, index):
+        img_name = os.path.join(self.root_dir, self.image_list[index])
+        data = h5py.File(img_name, 'r')
+        image = np.array(data['image'], dtype=np.float32) 
+        label = np.array(data['label'])
+        
+        data.close()
+        sample_pre_transform = {'image': image, 'label': label}
+
+        if self.transform is not None:
+            sample = self.transform(sample_pre_transform)
+            best_ssim = 0
+            best_sample = None
+            if self.two_crop:
+                new_samples = [self.transform(sample_pre_transform) for _ in range(self.num_of_samples)]
+                for new_sample in new_samples:
+                    sample_ssim = ssim(sample['cropped_imgae'], new_sample['cropped_image'])
+                    if sample_ssim > best_ssim:
+                        best_ssim = sample_ssim
+                        best_sample = new_sample
+                
+            sample['image_2'] = best_sample['image']
+            sample['label_2'] = best_sample['label']
+        else:
+            img = image
+
+        if self.use_jigsaw:
+             jigsaw_img = self.jigsaw_transform(sample_pre_transform)
+
+
+        sample['index'] = index
+        return sample
+    
+    
 def build_dataset(args):
     train_root, train_list, test_root, test_list = get_paths(args.dataset, args.data_root, args.train_list)
     train_transform, test_transform = build_transforms(args)
