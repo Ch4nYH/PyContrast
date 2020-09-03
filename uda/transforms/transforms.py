@@ -224,7 +224,7 @@ def build_transforms(args):
                         #RandomTranspose(),
                         RandomRotate(),
                         GaussianNoise(),
-                        GaussianBlur(),
+                        #GaussianBlur(),
                         ToTensor()])
         test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
                         ToTensor()])
@@ -233,7 +233,7 @@ def build_transforms(args):
                         RandomTranspose(),
                         RandomRotate(),
                         GaussianNoise(),
-                        GaussianBlur(),
+                        #GaussianBlur(),
                         ToTensor()])
         test_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=48, is_binary=True),
                         ToTensor()])
