@@ -93,7 +93,8 @@ class RandomCrop(object):
             d1 = np.random.randint(bbox[2][0], bbox[2][1] - self.output_size + 1)
             output_image[i] = image[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
             output_label[i] = label[w1:w1+self.output_size, h1:h1+self.output_size, d1:d1+self.output_size]
-        return {'image': output_image, 'label': output_label, 'cropped_image': copy.deepcopy(image)}
+        
+        return {'image': output_image, 'label': output_label, 'cropped_image': output_image}
 
 
 class RandomTranspose(object):
