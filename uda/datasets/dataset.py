@@ -51,8 +51,6 @@ class DatasetInstance(Dataset):
         if self.use_jigsaw:
              jigsaw_img = self.jigsaw_transform(sample_pre_transform)
 
-        print(sample['image'].shape)
-        print(sample['label'].shape)
         sample['index'] = index
         return sample
 
