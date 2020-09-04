@@ -4,7 +4,7 @@ import torch
 import dateutil.tz
 
 from tqdm import tqdm
-from utils import dice, Logger, Saver, adjust_learning_rate
+from utils.utils  import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
 from functions import train, validate
@@ -14,15 +14,8 @@ from datasets.dataset import build_dataset
 
 from torch.utils.data import DataLoader
 from models.vnet import VNet
+from torch.nn.parallel import DistributedDataParallel as DDP
 
-
-try:
-	from apex import amp, optimizers
-	from apex.parallel import DistributedDataParallel as DDP
-	apex = True
-except ImportError:
-	from torch.nn.parallel import DistributedDataParallel as DDP
-	apex = False
 def main():
 
 	args = parse_args()
