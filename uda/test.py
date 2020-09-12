@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import torch.nn.functional as F
 from torch.autograd import Variable
-from utils_legacy import load_data_test, dice, visualize, construct_PE
+from utils.utils_legacy import load_data_test, dice, visualize, construct_PE
 from datasets.paths import get_test_paths
 from models.vnet import VNet
 from collections import OrderedDict
