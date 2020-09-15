@@ -9,6 +9,43 @@ from scipy.ndimage.filters import gaussian_filter, gaussian_gradient_magnitude
 np.random.seed(42)
 random.seed(42)
 
+class RandomContrast(object):
+    def __init__(self, contrast_range=(0.75, 1.25), preserve_range=True, per_channel=True):
+        self.contrast_range = contrast_range
+        self.perserve_range = preserve_range
+        self.per_channel = per_channel
+    def __call__(self, sample):
+        image, label = sample['image'], sample['label']
+        if not self.per_channel:
+            mn = image.mean()
+            if self.preserve_range:
+                minm = image.min()
+                maxm = image.max()
+            if np.random.random() < 0.5 and contrast_range[0] < 1:
+                factor = np.random.uniform(contrast_range[0], 1)
+            else:
+                factor = np.random.uniform(max(contrast_range[0], 1), contrast_range[1])
+            image = (image - mn) * factor + mn
+            if self.preserve_range:
+                image[image < minm] = minm
+                image[image > maxm] = maxm
+        else:
+            for c in range(image.shape[0]):
+                mn = image[c].mean()
+                if self.preserve_range:
+                    minm = image[c].min()
+                    maxm = image[c].max()
+                if np.random.random() < 0.5 and contrast_range[0] < 1:
+                    factor = np.random.uniform(contrast_range[0], 1)
+                else:
+                    factor = np.random.uniform(max(contrast_range[0], 1), contrast_range[1])
+                image[c] = (image[c] - mn) * factor + mn
+                if self.preserve_range:
+                    image[c][image[c] < minm] = minm
+                    image[c][image[c] > maxm] = maxm
+                    
+        sample['image'] = image
+        return sample
 class RandomCropSlices(object):
     def __init__(self, output_size, sample_num=4, pad=32, is_binary=True):
         self.output_size = output_size
@@ -217,6 +254,7 @@ def build_transforms(args):
                         #RandomTranspose(),
                         RandomRotate(),
                         GaussianNoise(),
+                        RandomContrast(),
                         #GaussianBlur(),
                         ToTensor()])
         test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
