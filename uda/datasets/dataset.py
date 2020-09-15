@@ -56,7 +56,7 @@ class DatasetInstance(Dataset):
 
 class DatasetInstanceWithSSIM(DatasetInstance):
     def __init__(self, list_file, root_dir, transform=None, 
-        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=16, split='train'):
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=8, split='train'):
         super(DatasetInstanceWithSSIM, self).__init__(list_file, root_dir, transform, 
         need_non_zero_label, is_binary, jigsaw_transform)
         self.num_of_samples = num_of_samples
@@ -80,11 +80,12 @@ class DatasetInstanceWithSSIM(DatasetInstance):
                 new_samples.append(sample)
                 for i in range(len(new_samples)):
                     for j in range(len(new_samples)):
-                        sample_ssim = ssim(new_samples[i]['cropped_image'], new_samples[j]['cropped_image'])
-                        if sample_ssim > best_ssim:
-                            best_ssim = sample_ssim
-                            best_i = i
-                            best_j = j
+                        if i != j:
+                            sample_ssim = ssim(new_samples[i]['cropped_image'], new_samples[j]['cropped_image'])
+                            if sample_ssim > best_ssim:
+                                best_ssim = sample_ssim
+                                best_i = i
+                                best_j = j
                             
             sample['image'] = new_samples[best_i]['image']
             sample['label'] = new_samples[best_i]['label']
