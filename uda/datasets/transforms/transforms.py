@@ -12,8 +12,9 @@ random.seed(42)
 class RandomContrast(object):
     def __init__(self, contrast_range=(0.75, 1.25), preserve_range=True, per_channel=True):
         self.contrast_range = contrast_range
-        self.perserve_range = preserve_range
+        self.preserve_range = preserve_range
         self.per_channel = per_channel
+        
     def __call__(self, sample):
         image, label = sample['image'], sample['label']
         if not self.per_channel:
@@ -21,10 +22,10 @@ class RandomContrast(object):
             if self.preserve_range:
                 minm = image.min()
                 maxm = image.max()
-            if np.random.random() < 0.5 and contrast_range[0] < 1:
-                factor = np.random.uniform(contrast_range[0], 1)
+            if np.random.random() < 0.5 and self.contrast_range[0] < 1:
+                factor = np.random.uniform(self.contrast_range[0], 1)
             else:
-                factor = np.random.uniform(max(contrast_range[0], 1), contrast_range[1])
+                factor = np.random.uniform(max(self.contrast_range[0], 1), self.contrast_range[1])
             image = (image - mn) * factor + mn
             if self.preserve_range:
                 image[image < minm] = minm
@@ -35,10 +36,10 @@ class RandomContrast(object):
                 if self.preserve_range:
                     minm = image[c].min()
                     maxm = image[c].max()
-                if np.random.random() < 0.5 and contrast_range[0] < 1:
-                    factor = np.random.uniform(contrast_range[0], 1)
+                if np.random.random() < 0.5 and self.contrast_range[0] < 1:
+                    factor = np.random.uniform(self.contrast_range[0], 1)
                 else:
-                    factor = np.random.uniform(max(contrast_range[0], 1), contrast_range[1])
+                    factor = np.random.uniform(max(self.contrast_range[0], 1), self.contrast_range[1])
                 image[c] = (image[c] - mn) * factor + mn
                 if self.preserve_range:
                     image[c][image[c] < minm] = minm
