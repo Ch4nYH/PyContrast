@@ -24,7 +24,7 @@ def main():
 	
 	root_path = 'exps/exp_{}'.format(args.exp)
  
-	if not os.path.exists(root_path):
+	if not os.path.exists(root_path) and args.local_rank == 0:
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))
 		os.mkdir(os.path.join(root_path, "model"))
