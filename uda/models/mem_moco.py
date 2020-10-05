@@ -85,8 +85,8 @@ class RGBMoCo(BaseMoCo):
     
         # update memory
         all_k = all_k if all_k is not None else k
-        self._update_memory(all_k, self.memory)
-        #self._update_memory(torch.tensor([0,1,2,3] * int(all_k.size(0) / 4)).int(), self.memory_label)
+        #self._update_memory(all_k, self.memory)
+        self._update_memory(torch.tensor([0,1,2,3] * int(all_k.size(0) / 4)).int(), self.memory_label)
         self._update_pointer(all_k.size(0))
 
         if q_jig is not None:
