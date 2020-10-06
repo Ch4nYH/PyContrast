@@ -69,8 +69,8 @@ def main():
 		val_dataset, batch_size=1, 
 		num_workers=args.num_workers, pin_memory=True)
 
-	model = VNet(args.n_channels, args.n_classes, pretrain=True).cuda(args.local_rank)
-	model_ema = VNet(args.n_channels, args.n_classes, pretrain=True).cuda(args.local_rank)
+	model = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain=True).cuda(args.local_rank)
+	model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain=True).cuda(args.local_rank)
 	assert os.path.exists(args.load_path)
 
 	state_dict = model.state_dict()
