@@ -80,7 +80,8 @@ def main():
 	for k in list(pretrain_state_dict.keys()):
 		if k not in state_dict:
 			del pretrain_state_dict[k]
-
+		
+	state_dict.update(pretrain_state_dict)
 	model.load_state_dict(state_dict)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	
