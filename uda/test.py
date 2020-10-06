@@ -61,10 +61,10 @@ if __name__ == "__main__":
     print("Loading weights...")
     for k in list(new_state_dict.keys()):
         if k not in state_dict:
-			del new_state_dict[k]
-		
-	state_dict.update(new_state_dict)
-	net.load_state_dict(state_dict)
+            del new_state_dict[k]
+        
+    state_dict.update(new_state_dict)
+    net.load_state_dict(state_dict)
     net.cuda()
     net.eval()
     
