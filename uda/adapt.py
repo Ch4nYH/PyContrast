@@ -4,26 +4,31 @@ import torch
 import dateutil.tz
 
 from tqdm import tqdm
-from utils.utils  import dice, Logger, Saver, adjust_learning_rate
-from config import parse_args
 from datetime import datetime
+
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader
+
+from config import parse_args
 from functions import train, validate
+from pretrain_functions import pretrain
+from utils.utils  import dice, Logger, Saver, adjust_learning_rate
 from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataset
 
-from torch.utils.data import DataLoader
 from models.vnet import VNet
-from torch.nn.parallel import DistributedDataParallel as DDP
+from models.mem_moco import RGBMoCo
+
 
 def main():
 
 	args = parse_args()
-	args.pretrain = False
+	args.pretrain = True
 	print("Using GPU: {}".format(args.local_rank))
 	
 	root_path = 'exps/exp_{}'.format(args.exp)
- 
+
 	if not os.path.exists(root_path) and args.local_rank == 0:
 		os.mkdir(root_path)
 		os.mkdir(os.path.join(root_path, "log"))
@@ -53,7 +58,7 @@ def main():
 		train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
 	else:
 		train_sampler = None
-  
+
 	train_loader = torch.utils.data.DataLoader(
 		train_dataset, batch_size=args.batch_size, 
 		shuffle=(train_sampler is None),
@@ -78,18 +83,23 @@ def main():
 
 	model.load_state_dict(state_dict)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
+	
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 	if args.world_size > 1:
 		model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
 
 	model.train()
+	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+	model_ema.load_state_dict(model.state_dict())
 	print("Loaded weights")
 
 	logger = Logger(root_path)
 	saver = Saver(root_path)
-
+	contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
+	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in range(args.start_epoch, args.epochs):
-		train(model, train_loader, optimizer, logger, args, epoch)
+		train_sampler.set_epoch(epoch)
+		pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
 		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
 
