@@ -68,15 +68,7 @@ def main():
 
 	assert os.path.exists(args.load_path)
 
-	state_dict = model.state_dict()
-	print("Loading weights...")
-	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
 	
-	for k in list(pretrain_state_dict.keys()):
-		if k not in state_dict:
-			del pretrain_state_dict[k]
-
-	model.load_state_dict(state_dict)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 	if args.world_size > 1:
@@ -84,6 +76,16 @@ def main():
 
 	model.train()
 	print("Loaded weights")
+ 
+ 	state_dict = model.state_dict()
+	print("Loading weights...")
+	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
+	
+	for k in list(pretrain_state_dict.keys()):
+		if k not in state_dict:
+			del pretrain_state_dict[k]
+
+	model.load_state_dict(pretrain_state_dict)
 
 	logger = Logger(root_path)
 	saver = Saver(root_path)
