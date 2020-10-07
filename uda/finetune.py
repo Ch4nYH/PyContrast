@@ -75,7 +75,7 @@ def main():
         model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
 
     model.train()
-    print("Loaded weights")
+    
  
     state_dict = model.state_dict()
     print("Loading weights...")
@@ -84,7 +84,8 @@ def main():
     for k in list(pretrain_state_dict.keys()):
         if k not in state_dict:
             del pretrain_state_dict[k]
-
+            
+    print("Loaded weights")
     model.load_state_dict(pretrain_state_dict)
 
     logger = Logger(root_path)
