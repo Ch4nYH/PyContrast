@@ -77,7 +77,7 @@ def main():
     model.train()
     print("Loaded weights")
  
-     state_dict = model.state_dict()
+    state_dict = model.state_dict()
     print("Loading weights...")
     pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
     
@@ -94,7 +94,6 @@ def main():
         train(model, train_loader, optimizer, logger, args, epoch)
         validate(model, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
-
 
 if __name__ == '__main__':
     main()
