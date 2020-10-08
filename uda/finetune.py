@@ -76,7 +76,7 @@ def main():
 
     model.train()
     
-    if args.resume is not None:
+    if args.resume is None:
         assert os.path.exists(args.load_path)
         state_dict = model.state_dict()
         print("Loading weights...")
