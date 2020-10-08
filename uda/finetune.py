@@ -66,7 +66,7 @@ def main():
 
     model = VNet(args.n_channels, args.n_classes).cuda(args.local_rank)
 
-    assert os.path.exists(args.load_path)
+    
 
     
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
@@ -77,6 +77,7 @@ def main():
     model.train()
     
     if args.resume is not None:
+        assert os.path.exists(args.load_path)
         state_dict = model.state_dict()
         print("Loading weights...")
         pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
