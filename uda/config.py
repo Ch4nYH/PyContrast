@@ -40,6 +40,7 @@ def parse_args():
 	parser.add_argument("--train-list", default=None, type=str)
 	parser.add_argument("--ssim", action="store_true", default=False)	
  
+	parser.add_argument("--resume", type=str, help="resume checkpoint")
 	args = parser.parse_args()
 
 	return args

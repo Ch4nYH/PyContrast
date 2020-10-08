@@ -76,22 +76,30 @@ def main():
 
     model.train()
     
- 
-    state_dict = model.state_dict()
-    print("Loading weights...")
-    pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
+    if args.resume is not None:
+        state_dict = model.state_dict()
+        print("Loading weights...")
+        pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
+        
+        for k in list(pretrain_state_dict.keys()):
+            if k not in state_dict:
+                del pretrain_state_dict[k]
+                
+        print("Loaded weights")
+    else:
+        print("Resuming from {}".format(args.resume))
+        checkpoint = torch.load(args.resume)
+        
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        model.load_state_dict(checkpoint['state_dict'])
     
-    for k in list(pretrain_state_dict.keys()):
-        if k not in state_dict:
-            del pretrain_state_dict[k]
-            
-    print("Loaded weights")
     model.load_state_dict(pretrain_state_dict)
 
     logger = Logger(root_path)
     saver = Saver(root_path)
 
     for epoch in range(args.start_epoch, args.epochs):
+        train_sampler.set_epoch(epoch)
         train(model, train_loader, optimizer, logger, args, epoch)
         validate(model, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
