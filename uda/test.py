@@ -23,13 +23,14 @@ parser.add_argument('--lambda_pe', type=float, default=0.0, help='position encod
 parser.add_argument('--load-path', type=str)
 parser.add_argument('--n-classes', type=int, default=2)
 parser.add_argument('--n-channels', type=int, default=1)
+parser.add_argument('--data-root', type=str, default='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets')
 args = parser.parse_args()
 
 classes = ['Pancreas']
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 print('processing dataset {}'.format(args.dataset))
 
-root_dir, list_path = get_test_paths(args.dataset)
+root_dir, list_path = get_test_paths(args.dataset, args.data_root)
 
 
 stride = 20
