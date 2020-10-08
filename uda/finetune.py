@@ -85,7 +85,7 @@ def main():
         for k in list(pretrain_state_dict.keys()):
             if k not in state_dict:
                 del pretrain_state_dict[k]
-                
+        model.load_state_dict(pretrain_state_dict)
         print("Loaded weights")
     else:
         print("Resuming from {}".format(args.resume))
@@ -94,7 +94,7 @@ def main():
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         model.load_state_dict(checkpoint['state_dict'])
     
-    model.load_state_dict(pretrain_state_dict)
+    
 
     logger = Logger(root_path)
     saver = Saver(root_path)
