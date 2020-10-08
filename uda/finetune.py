@@ -89,7 +89,7 @@ def main():
         print("Loaded weights")
     else:
         print("Resuming from {}".format(args.resume))
-        checkpoint = torch.load(args.resume)
+        checkpoint = torch.load(args.resume, map_location="cpu")
         
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         model.load_state_dict(checkpoint['state_dict'])
