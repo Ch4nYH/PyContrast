@@ -98,7 +98,9 @@ if __name__ == "__main__":
         if args.dataset == 'synapse':
             shape = list(image.shape)
             shape[0] *= 3
-            image = F.interpolate(image, size=shape, mode='trilinear')
+            image = image.reshape((1, 1,) + image.shape)
+            image = F.interpolate(image, size=(1, 1,) + tuple(shape), mode='trilinear')
+            image = image[0,0,:,;,:]
         # time_map P= np.zeros(image.shape).astype(np.float32)
         for x in range(0, sx):
             xs = stride * x
