@@ -24,6 +24,7 @@ parser.add_argument('--load-path', type=str)
 parser.add_argument('--n-classes', type=int, default=2)
 parser.add_argument('--n-channels', type=int, default=1)
 parser.add_argument('--data-root', type=str, default='/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets')
+parser.add_argument('--votemap', type=str, default='votemap')
 args = parser.parse_args()
 
 classes = ['Pancreas']
@@ -36,7 +37,7 @@ root_dir, list_path = get_test_paths(args.dataset, args.data_root)
 stride = 20
 n_class = 2
 
-votesave_path = os.path.join('votemap')
+votesave_path = os.path.join(args.votemap)
 os.makedirs(votesave_path, exist_ok=True)
 
 patch_size = 64
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         image = Variable(torch.from_numpy(image.astype(np.float32)).cuda())
         if args.dataset == 'synapse':
             image = F.interpolate(image, size=(w, h, d*3))
-        # time_map = np.zeros(image.shape).astype(np.float32)
+        # time_map P= np.zeros(image.shape).astype(np.float32)
         for x in range(0, sx):
             xs = stride * x
             for y in range(0, sy):
@@ -162,8 +163,8 @@ if __name__ == "__main__":
     dices.append(mean_dice)
 
     print('saving volumes to {}'.format(
-        os.path.join('votemap', '{}.csv'.format(args.dataset))))
+        os.path.join(args.votemap, '{}.csv'.format(args.dataset))))
     pd.DataFrame(data={'name': case_list, 'dsc': dices}).to_csv(
-        os.path.join('votemap', '{}.csv'.format(args.dataset)), index=False)
+        os.path.join(args.votemap, '{}.csv'.format(args.dataset)), index=False)
 
     print('Average DSC: {:.5f}'.format(mean_dice))
