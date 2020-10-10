@@ -94,9 +94,11 @@ if __name__ == "__main__":
         sz = math.floor((d - patch_size) / stride) + 1
         vote_map = torch.zeros((n_class, w, h, d), dtype=torch.float).cuda()
         vote_map[0] += 0.1
-        image = Variable(torch.from_numpy(image.astype(np.float32)).cuda())
+        image = torch.from_numpy(image.astype(np.float32)).cuda()
         if args.dataset == 'synapse':
-            image = F.interpolate(image, size=torch.Tensor([w*3, h, d]), mode='nearest')
+            shape = image.shape
+            shape[0] *= 3
+            image = F.interpolate(image, size=shape, mode='trilinear')
         # time_map P= np.zeros(image.shape).astype(np.float32)
         for x in range(0, sx):
             xs = stride * x
