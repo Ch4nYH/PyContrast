@@ -96,7 +96,7 @@ if __name__ == "__main__":
         vote_map[0] += 0.1
         image = torch.from_numpy(image.astype(np.float32)).cuda()
         if args.dataset == 'synapse':
-            shape = image.shape
+            shape = list(image.shape)
             shape[0] *= 3
             image = F.interpolate(image, size=shape, mode='trilinear')
         # time_map P= np.zeros(image.shape).astype(np.float32)
