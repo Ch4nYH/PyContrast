@@ -86,6 +86,7 @@ if __name__ == "__main__":
             padded = True
         else:
             padded = False
+        
         w, h, d = image.shape
         sx = math.floor((w - patch_size) / stride) + 1
         sy = math.floor((h - patch_size) / stride) + 1
@@ -93,6 +94,8 @@ if __name__ == "__main__":
         vote_map = torch.zeros((n_class, w, h, d), dtype=torch.float).cuda()
         vote_map[0] += 0.1
         image = Variable(torch.from_numpy(image.astype(np.float32)).cuda())
+        if args.dataset == 'synapse':
+            image = F.interpolate(image, size=(w, h, d*3))
         # time_map = np.zeros(image.shape).astype(np.float32)
         for x in range(0, sx):
             xs = stride * x

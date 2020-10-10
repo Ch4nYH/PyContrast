@@ -70,7 +70,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 			logger.step()
 	if gpu == 0:
 		saver.save(epoch, {
-			'state_dict': model.state_dict(),
+			'state_dict': model_ema.state_dict(),
 			'acc': acc_meter.avg,
 			'optimizer_state_dict': optimizer.state_dict(),
 			#'amp': amp.state_dict() if args.amp else None
