@@ -77,6 +77,7 @@ def main():
     logger = Logger(root_path)
     saver = Saver(root_path)
     contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
+    criterion = torch.nn.CrossEntropyLoss()
     for epoch in range(args.start_epoch, args.epochs):
         train_sampler.set_epoch(epoch)
         train(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
