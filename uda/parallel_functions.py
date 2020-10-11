@@ -22,9 +22,9 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
 
 		with torch.cuda.amp.autocast(): 
-			q = model.pretrain_forward(volume)
+			q = model(volume, pretrain=True)
 			with torch.no_grad():
-				k = model_ema.pretrain_forward(volume2)
+				k = model_ema(volume2, pretrain=True)
 
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
@@ -55,10 +55,9 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
    
    
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
-
-	model.eval()
-	dices = []
+ 
 def validate(model, loader, optimizer, logger, saver, args, epoch):
+    model.eval()
 	dices = []
 	for i, batch in enumerate(loader):
 		index = batch['index']
