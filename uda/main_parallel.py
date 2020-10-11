@@ -64,7 +64,7 @@ def main():
         num_workers=args.num_workers, pin_memory=True)
 
     model = VNet(args.n_channels, args.n_classes).cuda(args.local_rank)
-    
+    model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = True).cuda(args.local_rank)
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
     if args.world_size > 1:
         model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
