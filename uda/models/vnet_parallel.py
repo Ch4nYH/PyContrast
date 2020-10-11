@@ -192,6 +192,6 @@ class VNet(nn.Module):
         
     def forward(self, x, pretrain=False):
         if pretrain:
-            self.pretrain_forward(x)
+            return self.pretrain_forward(x)
         else:
-            self.normal_forward(x)
+            return self.normal_forward(x)
