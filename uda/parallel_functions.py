@@ -57,7 +57,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
  
 def validate(model, loader, optimizer, logger, saver, args, epoch):
-    model.eval()
+	model.eval()
 	dices_ = []
 	for i, batch in enumerate(loader):
 		index = batch['index']
