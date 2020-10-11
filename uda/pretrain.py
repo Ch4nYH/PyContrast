@@ -76,5 +76,5 @@ contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
 criterion = torch.nn.CrossEntropyLoss()
 for epoch in range(args.start_epoch, args.epochs):
 	train_sampler.set_epoch(epoch)
-	pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
+	pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
 	adjust_learning_rate(args, optimizer, epoch)

@@ -4,7 +4,7 @@ from tqdm import tqdm
 from utils.utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
 from models import mem_moco
 
-def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, gpu):
+def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion):
 	model.train()
 	model_ema.eval()
 
@@ -23,10 +23,10 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 	scaler = torch.cuda.amp.GradScaler() 
 	for i, batch in enumerate(loader):
 		index = batch['index']
-		volume = batch['image'].cuda(gpu, non_blocking = True)
+		volume = batch['image'].cuda(args.local_rank, non_blocking = True)
 		volume = volume.view((-1,) + volume.shape[2:])
 
-		volume2 = batch['image_2'].cuda(gpu, non_blocking = True)
+		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
   
 		with torch.cuda.amp.autocast(): 
