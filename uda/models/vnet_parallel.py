@@ -132,7 +132,7 @@ class OutputTransition(nn.Module):
 class VNet(nn.Module):
     # the number of convolutions in each layer corresponds
     # to what is in the actual prototxt, not the intent
-    def __init__(self, n_channels, n_classes, input_size = 128, elu=False, pretrain = False, feat_dim=128, jigsaw = False):
+    def __init__(self, n_channels, n_classes, input_size = 64, elu=False, pretrain = False, feat_dim=128, jigsaw = False):
         super(VNet, self).__init__()
         self.in_tr = InputTransition(n_channels, elu)
         self.down_tr32 = DownTransition(16, 1, elu)
