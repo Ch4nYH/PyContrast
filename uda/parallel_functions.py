@@ -58,7 +58,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
  
 def validate(model, loader, optimizer, logger, saver, args, epoch):
     model.eval()
-	dices = []
+	dices_ = []
 	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda()
@@ -69,7 +69,7 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 		output, _ = model(volume)
 		pred = output.argmax(dim = 1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
-		dices.append(d)
+		dices_.append(d)
 		if args.local_rank == 0:
 			logger.log("test/dice", d)
 			saver.save(epoch, {
@@ -77,4 +77,4 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 					'dice': d,
 					'optimizer_state_dict': optimizer.state_dict()
 				}, d)
-	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices) / len(dices)))
+	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices_) / len(dices_)))
