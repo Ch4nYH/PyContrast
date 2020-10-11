@@ -20,7 +20,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		volume = batch['image'].cuda(args.local_rank, non_blocking = True)
 		volume = volume.view((-1,) + volume.shape[2:])
 		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
-
+		volume2 = volume2.view((-1,) + volume2.shape[2:])
 		with torch.cuda.amp.autocast(): 
 			q = model(volume, pretrain=True)
 			with torch.no_grad():
