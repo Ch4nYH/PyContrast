@@ -41,6 +41,8 @@ def parse_args():
 	parser.add_argument("--ssim", action="store_true", default=False)	
  
 	parser.add_argument("--resume", type=str, help="resume checkpoint")
+ 
+	parser.add_argument('--coef', type=float, default=0.2)
 	args = parser.parse_args()
 
 	return args
