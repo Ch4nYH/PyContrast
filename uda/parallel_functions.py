@@ -35,7 +35,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		label  = label.view((-1,) + label.shape[2:])
 		output, _ = model_ema(volume)
 		loss = cross_entropy_3d(output, label)
-		loss += losses[0]
+		loss += losses[0] * 0.1
 
 		optimizer.zero_grad()
 		loss.backward()
