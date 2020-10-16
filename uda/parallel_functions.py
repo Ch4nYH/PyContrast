@@ -47,6 +47,8 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		dices.append(d)
 		losses.append(loss)
 		losses.append(loss.detach().cpu().item())
+  
+		momentum_update(model, model_ema)
 		if i % print_freq == 0 and args.local_rank == 0:
 			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
 			logger.log("train/loss", loss)
@@ -78,3 +80,9 @@ def validate(model, loader, optimizer, logger, saver, args, epoch):
 					'optimizer_state_dict': optimizer.state_dict()
 				}, d)
 	tqdm.write("[Epoch {}] test avg dice: {}".format(epoch, sum(dices_) / len(dices_)))
+
+
+def momentum_update(model, model_ema, m = 0.999):
+    """ model_ema = m * model_ema + (1 - m) model """
+    for p1, p2 in zip(model.parameters(), model_ema.parameters()):
+        p2.data.mul_(m).add_(1 - m, p1.detach().data)
