@@ -20,7 +20,7 @@ from models.mem_moco import RGBMoCo
 def main():
 
     args = parse_args()
-    args.pretrain = False
+    args.pretrain = True
     print("Using GPU: {}".format(args.local_rank))
     root_path = 'exps/exp_{}'.format(args.exp)
     if args.local_rank == 0 and not os.path.exists(root_path):
