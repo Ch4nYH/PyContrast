@@ -43,6 +43,7 @@ def parse_args():
 	parser.add_argument("--resume", type=str, help="resume checkpoint")
  
 	parser.add_argument('--coef', type=float, default=0.2)
+ 	parser.add_argument('--increasing-coef', action="store_true")
 	args = parser.parse_args()
 
 	return args
