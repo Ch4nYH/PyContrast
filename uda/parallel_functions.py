@@ -30,13 +30,15 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		losses, accuracies = compute_loss_accuracy(
 						logits=output[:-1], target=output[-1],
 						criterion=criterion)
-	
+		optimizer.zero_grad()
+		(losses[0] * args.coef).backward()
+		optimizer.step()
+
 		label  = batch['label'].cuda(args.local_rank)
 		label  = label.view((-1,) + label.shape[2:])
 		feature, _ = model(volume)
 		loss = cross_entropy_3d(feature, label)
-		loss += losses[0] * args.coef
-
+		
 		optimizer.zero_grad()
 		loss.backward()
 		optimizer.step()
