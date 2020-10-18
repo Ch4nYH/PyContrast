@@ -41,7 +41,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		loss.backward()
 		optimizer.step()
 
-		pred = output.argmax(dim = 1)
+		pred = feature.argmax(dim = 1)
 		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		dices.append(d)
