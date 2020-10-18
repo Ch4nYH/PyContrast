@@ -21,16 +21,16 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		volume = volume.view((-1,) + volume.shape[2:])
 		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
-		with torch.cuda.amp.autocast(): 
-			q = model(volume, pretrain=True)
-			with torch.no_grad():
-				k = model_ema(volume2, pretrain=True)
+	
+		q = model(volume, pretrain=True)
+		with torch.no_grad():
+			k = model_ema(volume2, pretrain=True)
 
-			output = contrast(q, k, all_k=None)
-			losses, accuracies = compute_loss_accuracy(
-							logits=output[:-1], target=output[-1],
-							criterion=criterion)
-		
+		output = contrast(q, k, all_k=None)
+		losses, accuracies = compute_loss_accuracy(
+						logits=output[:-1], target=output[-1],
+						criterion=criterion)
+	
 		label  = batch['label'].cuda(args.local_rank)
 		label  = label.view((-1,) + label.shape[2:])
 		output, _ = model(volume)
