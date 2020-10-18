@@ -33,8 +33,8 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 	
 		label  = batch['label'].cuda(args.local_rank)
 		label  = label.view((-1,) + label.shape[2:])
-		output, _ = model(volume)
-		loss = cross_entropy_3d(output, label)
+		feature, _ = model(volume)
+		loss = cross_entropy_3d(feature, label)
 		loss += losses[0] * args.coef
 
 		optimizer.zero_grad()
