@@ -35,6 +35,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 			(losses[0] * args.coef).backward()
 		else:
 			(losses[0] * epoch / args.epochs * args.coef).backward()
+
 		optimizer.step()
 
 		label  = batch['label'].cuda(args.local_rank)
