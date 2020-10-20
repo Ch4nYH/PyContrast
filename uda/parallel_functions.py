@@ -31,7 +31,7 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 						logits=output[:-1], target=output[-1],
 						criterion=criterion)
 		optimizer.zero_grad()
-		if not args.increaing_coef:
+		if not args.increasing_coef:
 			(losses[0] * args.coef).backward()
 		else:
 			(losses[0] * epoch / args.epochs * args.coef).backward()
