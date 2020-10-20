@@ -16,24 +16,24 @@ def parse_args():
 	parser.add_argument('--save-freq', type=int, default=100)
 	parser.add_argument('--amp', action="store_true")
 	parser.add_argument('--opt_level', type=str, default='O1',
-                            choices=['O1', 'O2'])
+							choices=['O1', 'O2'])
 
 	parser.add_argument('--load-path', type=str, default=None)
 	parser.add_argument('--world-size', default=-1, type=int,
-	                    help='number of nodes for distributed training')
+						help='number of nodes for distributed training')
 	parser.add_argument('--rank', default=-1, type=int,
-                        help='node rank for distributed training')
+						help='node rank for distributed training')
 	parser.add_argument('--dist-url', default='tcp://127.0.0.1:23456', type=str,
-	                    help='url used to set up distributed training')
+						help='url used to set up distributed training')
 	parser.add_argument('--dist-backend', default='nccl', type=str,
-	                    help='distributed backend')
+						help='distributed backend')
 	parser.add_argument('--gpu', default=None, type=str,
-	                    help='GPU id to use.')
+						help='GPU id to use.')
 	parser.add_argument('--multiprocessing-distributed', action='store_true',
-                            help='Use multi-processing distributed training to launch '
-                                 'N processes per node, which has N GPUs. This is the '
-                                 'fastest way to use PyTorch for either single node or '
-                                 'multi node data parallel training')
+							help='Use multi-processing distributed training to launch '
+								 'N processes per node, which has N GPUs. This is the '
+								 'fastest way to use PyTorch for either single node or '
+								 'multi node data parallel training')
 	parser.add_argument("--local_rank", type=int, default=0)
 	parser.add_argument("--port", type=str, default="15000")
 	parser.add_argument("--data-root", default="/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets")
@@ -43,7 +43,6 @@ def parse_args():
 	parser.add_argument("--resume", type=str, help="resume checkpoint")
  
 	parser.add_argument('--coef', type=float, default=0.2)
- 	parser.add_argument('--increasing-coef', action="store_true")
+	parser.add_argument('--increasing-coef', action="store_true")
 	args = parser.parse_args()
-
 	return args
