@@ -20,7 +20,10 @@ from models.mem_moco import RGBMoCo
 def main():
 
     args = parse_args()
-    args.pretrain = True
+    if args.turnon < 0:
+        args.pretrain = True
+    else:
+        args.pretrain = False
     print("Using GPU: {}".format(args.local_rank))
     root_path = 'exps/exp_{}'.format(args.exp)
     if args.local_rank == 0 and not os.path.exists(root_path):
@@ -78,12 +81,28 @@ def main():
     saver = Saver(root_path)
     contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
     criterion = torch.nn.CrossEntropyLoss()
+
+    flag = False
     for epoch in range(args.start_epoch, args.epochs):
         train_sampler.set_epoch(epoch)
         train(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
         validate(model_ema, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
-
+        if not flag and args.turnon > 0 and epoch >= args.turnon:
+            train_dataset, val_dataset = build_dataset(args)
+            train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
+            train_loader = torch.utils.data.DataLoader(
+                train_dataset, batch_size=args.batch_size, 
+                shuffle=(train_sampler is None),
+                sampler = train_sampler,
+                num_workers=args.num_workers, pin_memory=True)
+    
+            val_loader = torch.utils.data.DataLoader(
+                val_dataset, batch_size=1, 
+                num_workers=args.num_workers, pin_memory=True)
+            
+            flag = True
+        
 
 if __name__ == '__main__':
     main()
