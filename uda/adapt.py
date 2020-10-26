@@ -17,7 +17,7 @@ from datasets.paths import get_paths
 from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataset
 
-from models.vnet import VNet
+from models.vnet_parallel import VNet
 from models.mem_moco import RGBMoCo
 
 

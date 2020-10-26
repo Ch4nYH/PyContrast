@@ -14,7 +14,7 @@ from .utils import ssim
 class DatasetInstance(Dataset):
 
     def __init__(self, list_file, root_dir, transform=None, 
-        need_non_zero_label = True, is_binary = False, jigsaw_transform = None):
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, dataset='nih_pancreas'):
         self.image_list = open(list_file).readlines()
         self.image_list = [os.path.basename(line.strip()) for line in self.image_list]
         self.image_list = [line for line in self.image_list if line.endswith('.h5')]
@@ -24,7 +24,7 @@ class DatasetInstance(Dataset):
 
         self.two_crop = True
         self.use_jigsaw = False #TODO
-
+        self.dataset = dataset
         print('read {} images'.format(len(self.image_list)))
 
     def __len__(self):
@@ -38,6 +38,16 @@ class DatasetInstance(Dataset):
         
         data.close()
         sample_pre_transform = {'image': image, 'label': label}
+        
+
+        if self.dataset == 'synapse':
+            image = torch.from_numpy(image)
+            shape = list(image.shape)
+            shape[0] *= 3
+            image = image.reshape((1,1,)+image.shape)
+            image = np.interpolate(image, size = tuple(shape), mode='trilinear')
+            image = image[0,0,:,:,:]
+            image = image.numpy()
 
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
