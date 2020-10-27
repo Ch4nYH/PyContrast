@@ -76,10 +76,6 @@ def main():
 	state_dict = model.state_dict()
 	print("Loading weights...")
 	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
-	
-	for k in list(pretrain_state_dict.keys()):
-		if k not in state_dict:
-			del pretrain_state_dict[k]
 		
 	state_dict.update(pretrain_state_dict)
 	model.load_state_dict(state_dict)

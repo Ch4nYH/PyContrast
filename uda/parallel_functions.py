@@ -57,7 +57,10 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
   
 		momentum_update(model, model_ema)
 		if i % print_freq == 0 and args.local_rank == 0:
-			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
+			if epoch > args.turnon:
+				tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}, contrast acc: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d, accuracies[0][0]))
+			else:
+				tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d))
 			logger.log("train/loss", loss)
 			logger.log("train/dice", d)
 			logger.step()
