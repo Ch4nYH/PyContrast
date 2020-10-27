@@ -45,6 +45,6 @@ def parse_args():
 	parser.add_argument('--coef', type=float, default=0.2)
 	parser.add_argument('--increasing-coef', action="store_true")
 
-	parser.add_argument('--turnon', default=-1, type=int)
+	parser.add_argument('--turnon', default=100, type=int)
 	args = parser.parse_args()
 	return args
