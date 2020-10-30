@@ -1,5 +1,6 @@
 import os
 import time
+from sklearn.manifold import TSNE
 import torch
 import dateutil.tz
 
@@ -84,7 +85,7 @@ def main():
             break
     features = torch.cat(features, 0)
 
-    from sklearn.manifold import TSNE
+    
     tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
     
     low_dim_embs = tsne.fit_transform(features.cpu().data.numpy())
