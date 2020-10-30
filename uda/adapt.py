@@ -77,9 +77,6 @@ def main():
 
 	state_dict = model.state_dict()
 	print("Loading weights...")
-	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
-		
-	model.load_state_dict(pretrain_state_dict)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
@@ -88,9 +85,14 @@ def main():
 
 	model.train()
 	model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+	
+
+	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
+		
+	model.load_state_dict(pretrain_state_dict)
 	model_ema.load_state_dict(model.state_dict())
 	print("Loaded weights")
-
+	
 	logger = Logger(root_path)
 	saver = Saver(root_path)
 	contrast = RGBMoCo(128, K = 128).cuda(args.local_rank)
