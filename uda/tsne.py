@@ -85,3 +85,6 @@ def main():
 
     print(features.shape)
 
+
+if __name__ == '__main__':
+    main()
