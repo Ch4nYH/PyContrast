@@ -75,7 +75,7 @@ class Logger(object):
 
 class Saver(object):
 
-    def __init__(self, path, save_freq = 10):
+    def __init__(self, path, save_freq = 1):
         self.path = path
         self.best_dice = 0
         self.save_freq = save_freq
