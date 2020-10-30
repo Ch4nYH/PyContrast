@@ -99,7 +99,7 @@ def main():
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in range(args.start_epoch, args.epochs):
 		train_sampler.set_epoch(epoch)
-		adapt(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
+		adapt(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
 		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
 
@@ -159,6 +159,6 @@ def momentum_update(model, model_ema, m = 0.999):
     """ model_ema = m * model_ema + (1 - m) model """
     for p1, p2 in zip(model.parameters(), model_ema.parameters()):
         p2.data.mul_(m).add_(1 - m, p1.detach().data)
-		
+
 if __name__ == '__main__':
 	main()
