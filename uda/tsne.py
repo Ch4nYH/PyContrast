@@ -13,7 +13,7 @@ from datasets.hdf5 import HDF5Dataset
 from datasets.dataset import build_dataset
 
 from torch.utils.data import DataLoader
-from models.vnet import VNet
+from models.vnet_parallel import VNet
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 def main():
