@@ -15,7 +15,7 @@ from datasets.dataset import build_dataset
 from torch.utils.data import DataLoader
 from models.vnet_parallel import VNet
 from torch.nn.parallel import DistributedDataParallel as DDP
-
+from tqdm import tqdm
 def main():
 
     args = parse_args()
@@ -72,7 +72,7 @@ def main():
     print("Using Dataset: {}".format(type(train_dataset)))
 
     features = []
-    for i, batch in enumerate(train_loader):
+    for i, batch in enumerate(tqdm(train_loader)):
         volume = batch['image'].cuda(args.local_rank, non_blocking = True)
         volume = volume.view((-1,) + volume.shape[2:])
 
