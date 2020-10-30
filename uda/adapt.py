@@ -94,7 +94,7 @@ def main():
 	print("Loaded weights")
 	
 	logger = Logger(root_path)
-	saver = Saver(root_path)
+	saver = Saver(root_path, save_freq=args.save_freq)
 	contrast = RGBMoCo(128, K = 512).cuda(args.local_rank)
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in range(args.start_epoch, args.epochs):
