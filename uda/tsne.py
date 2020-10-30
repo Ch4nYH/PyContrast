@@ -61,7 +61,7 @@ def main():
     model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = True).cuda(args.local_rank)
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
     #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-    parallel_state_dict = torch.load(args.load_path)['checkpoint']
+    parallel_state_dict = torch.load(args.load_path)['state_dict']
     new_state_dict = {}
     for (key, value) in parallel_state_dict:
         new_state_dict[key[:6]] = value
@@ -86,5 +86,5 @@ def main():
     print(features.shape)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
