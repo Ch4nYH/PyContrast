@@ -142,9 +142,9 @@ def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		momentum_update(model, model_ema)
 		if i % print_freq == 0 and args.local_rank == 0:
 			tqdm.write('[Epoch {}, {}/{}] contrast acc: {}'.format(epoch, i, len(loader), accuracies[0][0]))
-	
-	saver.save(epoch,  {
-			'state_dict': model_ema.state_dict()}, 0)
+	if args.local_rank == 0:
+		saver.save(epoch,  {
+				'state_dict': model_ema.state_dict()}, 0)
  
 def momentum_update(model, model_ema, m = 0.999):
     """ model_ema = m * model_ema + (1 - m) model """
