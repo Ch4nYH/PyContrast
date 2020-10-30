@@ -20,6 +20,8 @@ from datasets.dataset import build_dataset
 from models.vnet_parallel import VNet
 from models.mem_moco import RGBMoCo
 
+from utils.utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
+
 
 def main():
 
@@ -138,8 +140,7 @@ def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 
 		label  = batch['label'].cuda(args.local_rank)
 		label  = label.view((-1,) + label.shape[2:])
-		feature, _ = model(volume))
-
+		feature, _ = model(volume)
 		pred = feature.argmax(dim = 1)
 		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
