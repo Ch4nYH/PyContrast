@@ -64,7 +64,7 @@ def main():
     parallel_state_dict = torch.load(args.load_path)['state_dict']
     new_state_dict = {}
     for key in parallel_state_dict.keys():
-        new_state_dict[key[:6]] = parallel_state_dict[key]
+        new_state_dict[key[7:]] = parallel_state_dict[key]
 
     model.load_state_dict(new_state_dict)
     model.eval()
