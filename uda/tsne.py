@@ -81,7 +81,7 @@ def main():
             q = model(volume, pretrain=True)
 
         features.append(q)
-        if i > 10:
+        if i > 99:
             break
     features = torch.cat(features, 0)
 
