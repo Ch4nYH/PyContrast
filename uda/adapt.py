@@ -105,7 +105,7 @@ def main():
 
 
 
-def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, print_freq=10):
+def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, print_freq=1):
 	losses = []
 	dices = []
 	model.train()
