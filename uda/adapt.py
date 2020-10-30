@@ -155,6 +155,10 @@ def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
    
 	tqdm.write("[Epoch {}] avg dice: {}".format(epoch, sum(dices) / len(dices)))
  
-
+def momentum_update(model, model_ema, m = 0.999):
+    """ model_ema = m * model_ema + (1 - m) model """
+    for p1, p2 in zip(model.parameters(), model_ema.parameters()):
+        p2.data.mul_(m).add_(1 - m, p1.detach().data)
+		
 if __name__ == '__main__':
 	main()
