@@ -90,7 +90,7 @@ def main():
 	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
 		
 	model.load_state_dict(pretrain_state_dict)
-	model_ema.load_state_dict(model.state_dict())
+	model_ema.load_state_dict(pretrain_state_dict)
 	print("Loaded weights")
 	
 	logger = Logger(root_path)

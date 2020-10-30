@@ -89,6 +89,7 @@ def main():
         validate(model_ema, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
         if not flag and args.turnon > 0 and epoch >= args.turnon:
+            args.pretrain = True
             train_dataset, val_dataset = build_dataset(args)
             train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
             train_loader = torch.utils.data.DataLoader(
