@@ -17,5 +17,6 @@ def plot_with_labels(lowDWeights, labels):
         plt.text(x, y, s, backgroundcolor=c, fontsize=9)
     plt.xlim(X.min(), X.max());
     plt.ylim(Y.min(), Y.max());
-    plt.title('Visualize last layer');
+    plt.title('Visualize last layer')
+    plt.show()
     plt.savefig("1.jpg")
