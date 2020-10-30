@@ -69,7 +69,7 @@ def main():
     model.load_state_dict(new_state_dict)
     model.eval()
     print("Loaded weights")
-    
+    print("Using Dataset: {}".format(type(train_dataset)))
 
     features = []
     for i, batch in enumerate(train_loader):
