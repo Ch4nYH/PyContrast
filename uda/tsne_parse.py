@@ -1,4 +1,4 @@
-from sklearn import TSNE
+from sklearn.manifold import TSNE
 import numpy as np
 import pickle
 tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
