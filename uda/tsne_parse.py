@@ -7,7 +7,7 @@ tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
 features = pickle.load(open('features.pkl', 'rb'))
 low_dim_embs = tsne.fit_transform(features)
 target = np.array([1,2,3,4]).repeat(features.shape[0] // 4)
-
+plot_with_labels(low_dim_embs, target)
 
 def plot_with_labels(lowDWeights, labels):
     plt.cla()
