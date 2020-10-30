@@ -66,9 +66,9 @@ class DatasetInstance(Dataset):
 
 class DatasetInstanceWithSSIM(DatasetInstance):
     def __init__(self, list_file, root_dir, transform=None, 
-        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=7, split='train'):
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, num_of_samples=7, split='train', dataset='nih_pancreas'):
         super(DatasetInstanceWithSSIM, self).__init__(list_file, root_dir, transform, 
-        need_non_zero_label, is_binary, jigsaw_transform)
+        need_non_zero_label, is_binary, jigsaw_transform, dataset=dataset)
         self.num_of_samples = num_of_samples
         self.split = split
     def __getitem__(self, index):
@@ -116,12 +116,12 @@ def build_dataset(args):
     train_root, train_list, test_root, test_list = get_paths(args.dataset, args.data_root, args.train_list)
     train_transform, test_transform = build_transforms(args)
     if not args.ssim:
-        train_dataset = DatasetInstance(train_list, train_root, transform=train_transform)
+        train_dataset = DatasetInstance(train_list, train_root, transform=train_transform, dataset = args.dataset)
 
-        test_dataset = DatasetInstance(test_list, test_root, transform=test_transform)
+        test_dataset = DatasetInstance(test_list, test_root, transform=test_transform, dataset = args.dataset)
     else:
-        train_dataset = DatasetInstanceWithSSIM(train_list, train_root, transform=train_transform)
+        train_dataset = DatasetInstanceWithSSIM(train_list, train_root, transform=train_transform, dataset = args.dataset)
 
-        test_dataset = DatasetInstanceWithSSIM(test_list, test_root, transform=test_transform)
+        test_dataset = DatasetInstanceWithSSIM(test_list, test_root, transform=test_transform, dataset = args.dataset)
     
     return train_dataset, test_dataset

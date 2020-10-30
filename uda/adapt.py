@@ -77,8 +77,7 @@ def main():
 	print("Loading weights...")
 	pretrain_state_dict = torch.load(args.load_path, map_location="cpu")['state_dict']
 		
-	state_dict.update(pretrain_state_dict)
-	model.load_state_dict(state_dict)
+	model.load_state_dict(pretrain_state_dict)
 	optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 	
 	#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
@@ -96,10 +95,68 @@ def main():
 	criterion = torch.nn.CrossEntropyLoss()
 	for epoch in range(args.start_epoch, args.epochs):
 		train_sampler.set_epoch(epoch)
-		pretrain(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
-		#validate(model, val_loader, optimizer, logger, saver, args, epoch)
+		adapt(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion, args.local_rank)
+		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
 
+
+
+def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion, print_freq=10):
+	losses = []
+	dices = []
+	model.train()
+	model_ema.eval()
+	def set_bn_train(m):
+			classname = m.__class__.__name__
+			if classname.find('BatchNorm') != -1:
+				m.train()
+	model_ema.apply(set_bn_train)
+	scaler = torch.cuda.amp.GradScaler() 
+ 
+	for i, batch in enumerate(loader):
+		index = batch['index']
+		volume = batch['image'].cuda(args.local_rank, non_blocking = True)
+		volume = volume.view((-1,) + volume.shape[2:])
+		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
+		volume2 = volume2.view((-1,) + volume2.shape[2:])
+		
+		q = model(volume, pretrain=True)
+		with torch.no_grad():
+			k = model_ema(volume2, pretrain=True)
+
+		output = contrast(q, k, all_k=None)
+		losses, accuracies = compute_loss_accuracy(
+						logits=output[:-1], target=output[-1],
+						criterion=criterion)
+		optimizer.zero_grad()
+		if not args.increasing_coef:
+			(losses[0] * args.coef).backward()
+		else:
+			(losses[0] * epoch / args.epochs * args.coef).backward()
+
+		optimizer.step()
+
+		label  = batch['label'].cuda(args.local_rank)
+		label  = label.view((-1,) + label.shape[2:])
+		feature, _ = model(volume))
+
+		pred = feature.argmax(dim = 1)
+		label = label.squeeze(1)
+		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
+		dices.append(d)
+		losses.append(loss)
+		losses.append(loss.detach().cpu().item())
+  
+		momentum_update(model, model_ema)
+		if i % print_freq == 0 and args.local_rank == 0:
+			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}, contrast acc: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d, accuracies[0][0]))
+			logger.log("train/loss", loss)
+			logger.log("train/dice", d)
+			logger.step()
+   
+   
+	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
+ 
 
 if __name__ == '__main__':
 	main()
