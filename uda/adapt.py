@@ -139,21 +139,11 @@ def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 			(losses[0] * epoch / args.epochs * args.coef).backward()
 
 		optimizer.step()
-
-		label  = batch['label'].cuda(args.local_rank)
-		label  = label.view((-1,) + label.shape[2:])
-		feature, _ = model(volume)
-		pred = feature.argmax(dim = 1)
-		label = label.squeeze(1)
-		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
-		dices.append(d)
   
 		momentum_update(model, model_ema)
 		if i % print_freq == 0 and args.local_rank == 0:
-			tqdm.write('[Epoch {}, {}/{}] dice: {}, contrast acc: {}'.format(epoch, i, len(loader), d, accuracies[0][0]))
+			tqdm.write('[Epoch {}, {}/{}] contrast acc: {}'.format(epoch, i, len(loader), accuracies[0][0]))
    
-   
-	tqdm.write("[Epoch {}] avg dice: {}".format(epoch, sum(dices) / len(dices)))
  
 def momentum_update(model, model_ema, m = 0.999):
     """ model_ema = m * model_ema + (1 - m) model """

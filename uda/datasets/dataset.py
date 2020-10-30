@@ -51,14 +51,6 @@ class DatasetInstance(Dataset):
             image = image[0,0,:,:,:]
             image = image.numpy()
 
-            label = torch.from_numpy(label)
-            shape = list(label.shape)
-            shape[0] *= 3
-            label = label.reshape((1,1,)+label.shape)
-            label = F.interpolate(label, size = tuple(shape), mode='trilinear')
-            label = label[0,0,:,:,:]
-            label = label.numpy()
-
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
             if self.two_crop:
