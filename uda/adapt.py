@@ -100,7 +100,6 @@ def main():
 	for epoch in range(args.start_epoch, args.epochs):
 		train_sampler.set_epoch(epoch)
 		adapt(model, model_ema, train_loader, optimizer, logger, saver, args, epoch, contrast, criterion)
-		validate(model, val_loader, optimizer, logger, saver, args, epoch)
 		adjust_learning_rate(args, optimizer, epoch)
 
 
