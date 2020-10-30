@@ -9,6 +9,8 @@ from .paths import get_paths
 from .transforms.transforms import build_transforms
 from .utils import ssim
 
+import torch.nn.functional as F
+
 
 
 class DatasetInstance(Dataset):
@@ -45,7 +47,7 @@ class DatasetInstance(Dataset):
             shape = list(image.shape)
             shape[0] *= 3
             image = image.reshape((1,1,)+image.shape)
-            image = np.interpolate(image, size = tuple(shape), mode='trilinear')
+            image = F.interpolate(image, size = tuple(shape), mode='trilinear')
             image = image[0,0,:,:,:]
             image = image.numpy()
 

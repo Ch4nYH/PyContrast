@@ -147,18 +147,13 @@ def adapt(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 		label = label.squeeze(1)
 		d = dice(pred.cpu().data.numpy() == 1, label.cpu().data.numpy() == 1)
 		dices.append(d)
-		losses.append(loss)
-		losses.append(loss.detach().cpu().item())
   
 		momentum_update(model, model_ema)
 		if i % print_freq == 0 and args.local_rank == 0:
-			tqdm.write('[Epoch {}, {}/{}] loss: {}, dice: {}, contrast acc: {}'.format(epoch, i, len(loader), loss.detach().cpu().item(), d, accuracies[0][0]))
-			logger.log("train/loss", loss)
-			logger.log("train/dice", d)
-			logger.step()
+			tqdm.write('[Epoch {}, {}/{}] dice: {}, contrast acc: {}'.format(epoch, i, len(loader), d, accuracies[0][0]))
    
    
-	tqdm.write("[Epoch {}] avg loss: {}, avg dice: {}".format(epoch, sum(losses) / len(losses), sum(dices) / len(dices)))
+	tqdm.write("[Epoch {}] avg dice: {}".format(epoch, sum(dices) / len(dices)))
  
 
 if __name__ == '__main__':
