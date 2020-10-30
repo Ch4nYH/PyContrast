@@ -80,9 +80,16 @@ def main():
             q = model(volume, pretrain=True)
 
         features.append(q)
-
+        if i > 10:
+            break
     features = torch.cat(features, 0)
 
+    from sklearn.manifold import TSNE
+    tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
+    
+    low_dim_embs = tsne.fit_transform(features.cpu().data.numpy())
+    target = torch.Tensor([1,2,3,4]).repeat(features.shape[0] // 4, 1)
+    labels = target.cpu().numpy()
     print(features.shape)
 
 
