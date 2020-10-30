@@ -1,9 +1,9 @@
 import os
 import time
-from sklearn.manifold import TSNE
+
 import torch
 import dateutil.tz
-
+import pickle
 from tqdm import tqdm
 from utils.utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
@@ -85,14 +85,8 @@ def main():
             break
     features = torch.cat(features, 0)
 
-    
-    tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
-    
-    low_dim_embs = tsne.fit_transform(features.cpu().data.numpy())
-    target = torch.Tensor([1,2,3,4]).repeat(features.shape[0] // 4, 1)
-    labels = target.cpu().numpy()
-    print(features.shape)
+    pickle.dump(features.cpu().numpy(), open("features.pkl", 'wb'))
 
-
+    
 if __name__ == "__main__":
     main()
