@@ -258,6 +258,7 @@ class RandomZoomAndScale(object):
     def zoom(self, image, label):
         
         assert image.shape == label.shape
+        print(image.shape)
         size_0, size_1, size_2 = image.shape[0], image.shape[1], image.shape[2]
         size_out_0 = np.random.randint(size_0 * 2.0 / 3, size_0)
         size_out_1 = np.random.randint(size_1 * 2.0 / 3, size_1)
@@ -267,8 +268,8 @@ class RandomZoomAndScale(object):
         start_1 = np.random.randint(0, size_1 - size_out_1)
         start_2 = np.random.randint(0, size_2 - size_out_2)
 
-        cropped_image = image[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
-        cropped_label = label[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
+        cropped_image = image[start_0:start_0+size_out_0, start_1:start_1+size_1, start_2:start_2+size_2]
+        cropped_label = label[start_0:start_0+size_out_0, start_1:start_1+size_1, start_2:start_2+size_2]
 
         resize_img = resize(cropped_image, (size_0, size_1, size_2))
         resize_label = resize(cropped_label, (size_0, size_1, size_2))
