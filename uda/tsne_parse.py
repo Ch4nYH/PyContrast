@@ -4,7 +4,7 @@ import pickle
 import matplotlib.pyplot as plt
 from matplotlib import cm
 colors = ['red', 'blue', 'green', 'yellow']
-def plot_with_labels(lowDWeights, labels):
+def plot_with_labels(lowDWeights, labels, l):
     plt.cla()
     X, Y = lowDWeights[:, 0], lowDWeights[:, 1]
     for x, y, s in zip(X, Y, labels):
@@ -13,12 +13,13 @@ def plot_with_labels(lowDWeights, labels):
     plt.ylim(Y.min(), Y.max());
     plt.title('Visualize last layer')
     plt.show()
-    plt.savefig("1.jpg")
+    plt.savefig("{}.jpg".format(l))
 
 
 tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000)
 features = pickle.load(open('features.pkl', 'rb'))
 low_dim_embs = tsne.fit_transform(features)
 target = np.array([1,2,3,4]).repeat(features.shape[0] // 4)
-plot_with_labels(low_dim_embs, target)
+for i in range(1, 5):
+    plot_with_labels(low_dim_embs[target==i,:], target[target==i], i)
 
