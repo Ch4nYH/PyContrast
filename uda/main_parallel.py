@@ -20,11 +20,11 @@ from models.mem_moco import RGBMoCo
 import logging_config
 import logging.config
 import logging
-logging.config.dictConfig(logging_config.logging_config)
-logger = logging.getLogger()
+
 
 def main():
-
+    logging.config.dictConfig(logging_config.logging_config)
+    logger = logging.getLogger()
     args = parse_args()
     logger.info("Args: %s", args)
     if args.turnon < 0:
