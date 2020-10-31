@@ -252,16 +252,11 @@ class GaussianBlur(object):
 
 
 class RandomZoomAndScale(object):
-    def __init__(self, output_size, sample_num=1):
-        self.output_size = output_size
+    def __init__(self, sample_num=1):
         self.sample_num = sample_num
-        self.pad = pad
-        self.is_binary = is_binary
-    
     
     def zoom(self, image, label):
         
-        image, label = sample['image'], sample['label']
         assert image.shape == label.shape
         if self.is_binary and label.max() > 1:
             label[label > 1] = 0
@@ -278,8 +273,8 @@ class RandomZoomAndScale(object):
         cropped_image = image[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
         cropped_label = label[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
 
-        resize_img = resize(cropped_image, (self.output_size, self.output_size, self.output_size))
-        resize_label = resize(cropped_label, (self.output_size, self.output_size, self.output_size))
+        resize_img = resize(cropped_image, (size_0, size_1, size_2))
+        resize_label = resize(cropped_label, (size_0, size_1, size_2))
         return resize_img, resize_label
 
     def __call__(self, sample):
@@ -308,7 +303,7 @@ def build_transforms(args):
                         Duplicate(),
                         RandomZoomAndScale(),
                         ToTensor()])
-                        
+
         test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
                         ToTensor()])
     else:
