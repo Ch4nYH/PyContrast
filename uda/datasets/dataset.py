@@ -53,10 +53,6 @@ class DatasetInstance(Dataset):
 
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
-            if self.two_crop:
-                sample2 = self.transform(sample_pre_transform)
-                sample['image_2'] = sample2['image']
-                sample['label_2'] = sample2['label']
         else:
             img = image
 

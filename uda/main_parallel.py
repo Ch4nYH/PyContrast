@@ -17,9 +17,16 @@ from models.vnet_parallel import VNet
 from torch.nn.parallel import DistributedDataParallel as DDP
 from models.mem_moco import RGBMoCo
 
+import logging_config
+import logging.config
+import logging
+logging.config.dictConfig(logging_config.logging_config)
+logger = logging.getLogger()
+
 def main():
 
     args = parse_args()
+    logger.info("Args: %s", args)
     if args.turnon < 0:
         args.pretrain = True
     else:
@@ -27,6 +34,7 @@ def main():
     print("Using GPU: {}".format(args.local_rank))
     root_path = 'exps/exp_{}'.format(args.exp)
     if args.local_rank == 0 and not os.path.exists(root_path):
+        logger.info("Making folders: %s", root_path)
         os.mkdir(root_path)
         os.mkdir(os.path.join(root_path, "log"))
         os.mkdir(os.path.join(root_path, "model"))
@@ -65,7 +73,7 @@ def main():
     model.train()
     model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
     model_ema.load_state_dict(model.state_dict())
-    print("Loaded weights")
+    logger.info("Loaded weights")
 
     logger = Logger(root_path)
     saver = Saver(root_path)

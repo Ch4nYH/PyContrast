@@ -15,11 +15,17 @@ from datasets.dataset import build_dataset
 from torch.utils.data import DataLoader
 from models.vnet import VNet
 from torch.nn.parallel import DistributedDataParallel as DDP
+import logging_config
+import logging.config
+import logging
+logging.config.dictConfig(logging_config.logging_config)
+logger = logging.getLogger()
 
 def main():
 
     args = parse_args()
     args.pretrain = False
+    logger.info("Args: %s", args)
     print("Using GPU: {}".format(args.local_rank))
     root_path = 'exps/exp_{}'.format(args.exp)
     if args.local_rank == 0 and not os.path.exists(root_path):
@@ -32,6 +38,7 @@ def main():
     train_dataset, val_dataset = build_dataset(args)
     args.world_size = len(args.gpu.split(","))
     if args.world_size > 1:
+        logger.info("Using distributed training")
         os.environ['MASTER_PORT'] = args.port
         torch.cuda.set_device(args.local_rank)
         torch.distributed.init_process_group(
