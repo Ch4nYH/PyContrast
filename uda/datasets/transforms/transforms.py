@@ -203,11 +203,8 @@ class ToTensor(object):
         else:
             image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
         label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
-        
-        sample['image'] = image
-        sample['label'] = label
-
         return image, label
+        
     def __call__(self, sample):
         image, label = sample['image'], sample['label']
         image, label = self.totensor(image, label)
