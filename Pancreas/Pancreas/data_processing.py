@@ -4,7 +4,7 @@ import numpy as np
 import json
 
 # data path
-data_path = '/export/ccvl12b/datasets/nih_pancreas' # npy path
+data_path = '/mnt/disk1/nih_pancreas' # npy path
 save_path = os.path.join(data_path, 'nih_pad32/')
 
 save_list_path = 'train.list' # where to save your training lists
