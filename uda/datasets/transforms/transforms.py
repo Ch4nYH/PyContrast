@@ -197,9 +197,7 @@ class GaussianNoise(object):
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
-
-    def __call__(self, sample):
-        image, label = sample['image'], sample['label']
+    def totensor(self, image, label):
         if image.ndim >= 5:                                                     # already has channel dim
             image = torch.from_numpy(image.astype(np.float32))
         else:
@@ -209,6 +207,18 @@ class ToTensor(object):
         sample['image'] = image
         sample['label'] = label
 
+        return image, label
+    def __call__(self, sample):
+        image, label = sample['image'], sample['label']
+        image, label = self.totensor(image, label)
+
+        if 'image_2' in sample:
+            image_2, label_2 = self.totensor(sample['image_2'], sample['label_2'])
+
+        sample['image'] = image
+        sample['label'] = label
+        sample['image_2'] = image_2
+        sample['label_2'] = label_2
         return sample
 
 def get_range_val(value, rnd_type="uniform"):
