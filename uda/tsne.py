@@ -74,6 +74,7 @@ def main():
 
         if i > 100:
             break
+        
     features = torch.cat(features, 0)
 
     pickle.dump(features.cpu().numpy(), open("features.pkl", 'wb'))
