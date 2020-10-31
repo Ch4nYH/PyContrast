@@ -9,7 +9,7 @@ def plot_with_labels(lowDWeights, labels):
     X, Y = lowDWeights[:, 0], lowDWeights[:, 1]
     for x, y, s in zip(X, Y, labels):
         c = cm.rainbow(int(255 * s / 9));
-        plt.plot(x, y, color=c)
+        plt.scatter(x, y, c=c)
     plt.xlim(X.min(), X.max());
     plt.ylim(Y.min(), Y.max());
     plt.title('Visualize last layer')
