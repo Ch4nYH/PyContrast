@@ -258,9 +258,6 @@ class RandomZoomAndScale(object):
     def zoom(self, image, label):
         
         assert image.shape == label.shape
-        if self.is_binary and label.max() > 1:
-            label[label > 1] = 0
-
         size_0, size_1, size_2 = image.shape
         size_out_0 = np.random.randint(size_0 * 2.0 / 3, size_0)
         size_out_1 = np.random.randint(size_1 * 2.0 / 3, size_1)
