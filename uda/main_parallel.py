@@ -32,16 +32,6 @@ def main():
         os.mkdir(os.path.join(root_path, "model"))
     
     base_lr = args.lr  # base learning rate
-    batch_size = 1
-    max_iterations = 20000
-
-    cell_size = 96  # size of volume we crop patch from
-    patch_size = 64
-    puzzle_config = 3  # 2 or 3 for 2X2X2 or 3X3X3 puzzle
-    puzzle_num = puzzle_config ** 3
-    feature_len = 256  #
-    iter_num = 0
-    sr_feature_size = 32
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     train_dataset, val_dataset = build_dataset(args)
     args.world_size = len(args.gpu.split(","))

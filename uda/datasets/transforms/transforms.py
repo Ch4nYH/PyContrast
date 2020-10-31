@@ -4,6 +4,7 @@ import random
 import torchvision
 import numpy as np
 
+from skimage.transform import resize
 from scipy.ndimage.filters import gaussian_filter, gaussian_gradient_magnitude
 
 np.random.seed(42)
@@ -249,15 +250,65 @@ class GaussianBlur(object):
         sample['label'] = label
         return sample
 
+
+class RandomZoomAndScale(object):
+    def __init__(self, output_size, sample_num=1):
+        self.output_size = output_size
+        self.sample_num = sample_num
+        self.pad = pad
+        self.is_binary = is_binary
+    
+    
+    def zoom(self, image, label):
+        
+        image, label = sample['image'], sample['label']
+        assert image.shape == label.shape
+        if self.is_binary and label.max() > 1:
+            label[label > 1] = 0
+
+        size_0, size_1, size_2 = image.shape
+        size_out_0 = np.random.randint(size_0 * 2.0 / 3, size_0)
+        size_out_1 = np.random.randint(size_1 * 2.0 / 3, size_1)
+        size_out_2 = np.random.randint(size_2 * 2.0 / 3, size_2)
+
+        start_0 = np.random.randint(0, size_0 - size_out_0)
+        start_1 = np.random.randint(0, size_1 - size_out_1)
+        start_2 = np.random.randint(0, size_2 - size_out_2)
+
+        cropped_image = image[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
+        cropped_label = label[start_0:start_0+size_out_0, start_1:start_1:size_1, start_2:start_2+size_2]
+
+        resize_img = resize(cropped_image, (self.output_size, self.output_size, self.output_size))
+        resize_label = resize(cropped_label, (self.output_size, self.output_size, self.output_size))
+        return resize_img, resize_label
+
+    def __call__(self, sample):
+        label = sample['label']
+        image = sample['image']
+        resize_img, resize_label = self.zoom(image, label)
+        if 'image_2' in sample:
+            resize_img_2, resize_label_2 = self.zoom(sample['image_2'], label)
+            return {'image': resize_img, 'label': resize_label, 'image_2': resize_img_2, 'label_2': resize_label_2}
+        else:
+            return {'image': resize_img, 'label': resize_label}
+            
+
+class Duplicate(object):
+    def __call__(self, sample):
+        sample['image_2'] = copy.deepcopy(sample['image'])
+        return sample
+
 def build_transforms(args):
     if args.pretrain:
-        train_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
-                        #RandomTranspose(),
+        train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
+                        RandomTranspose(),
                         RandomRotate(),
                         GaussianNoise(),
                         RandomContrast(),
-                        #GaussianBlur(),
+                        Duplicate(),
+                        RandomZoomAndScale(),
                         ToTensor()])
+                        
         test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
                         ToTensor()])
     else:

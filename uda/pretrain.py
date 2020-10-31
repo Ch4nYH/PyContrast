@@ -39,15 +39,6 @@ if not os.path.exists(root_path):
 
 base_lr = args.lr  # base learning rate
 
-max_iterations = 40000
-cell_size = 96  # size of volume we crop patch from
-patch_size = 64
-puzzle_config = 3  # 2 or 3 for 2X2X2 or 3X3X3 puzzle
-puzzle_num = puzzle_config ** 3
-feature_len = 256  #
-iter_num = 0
-sr_feature_size = 32
-
 train_dataset, val_dataset = build_dataset(args)
 train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
     
