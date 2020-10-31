@@ -81,8 +81,6 @@ def main():
             q = model(volume, pretrain=True)
 
         features.append(q)
-        if i > 99:
-            break
     features = torch.cat(features, 0)
 
     pickle.dump(features.cpu().numpy(), open("features.pkl", 'wb'))
