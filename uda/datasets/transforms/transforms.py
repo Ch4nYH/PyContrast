@@ -209,13 +209,12 @@ class ToTensor(object):
         image, label = sample['image'], sample['label']
         image, label = self.totensor(image, label)
 
-        if 'image_2' in sample:
-            image_2, label_2 = self.totensor(sample['image_2'], sample['label_2'])
-
         sample['image'] = image
         sample['label'] = label
-        sample['image_2'] = image_2
-        sample['label_2'] = label_2
+        if 'image_2' in sample:
+            image_2, label_2 = self.totensor(sample['image_2'], sample['label_2'])
+            sample['image_2'] = image_2
+            sample['label_2'] = label_2
         return sample
 
 def get_range_val(value, rnd_type="uniform"):
