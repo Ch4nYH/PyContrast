@@ -258,7 +258,7 @@ class RandomZoomAndScale(object):
     def zoom(self, image, label):
         
         assert image.shape == label.shape
-        size_0, size_1, size_2 = image.shape
+        size_0, size_1, size_2 = image.shape[0], image.shape[1], image.shape[2]
         size_out_0 = np.random.randint(size_0 * 2.0 / 3, size_0)
         size_out_1 = np.random.randint(size_1 * 2.0 / 3, size_1)
         size_out_2 = np.random.randint(size_2 * 2.0 / 3, size_2)
