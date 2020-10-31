@@ -3,13 +3,12 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 from matplotlib import cm
-
+colors = ['red', 'blue', 'green', 'yellow']
 def plot_with_labels(lowDWeights, labels):
     plt.cla()
     X, Y = lowDWeights[:, 0], lowDWeights[:, 1]
     for x, y, s in zip(X, Y, labels):
-        c = cm.rainbow(int(255 * s / 9));
-        plt.scatter(x, y, c=c)
+        plt.scatter(x, y, color = colors[s - 1])
     plt.xlim(X.min(), X.max());
     plt.ylim(Y.min(), Y.max());
     plt.title('Visualize last layer')
