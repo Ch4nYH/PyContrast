@@ -285,9 +285,10 @@ class RandomZoomAndScale(object):
         image = sample['image']
         resize_img, resize_label = self.zoom(image, label)
         print(resize_img.shape)
-        print(resize_img_2.shape)
+
         if 'image_2' in sample:
             resize_img_2, resize_label_2 = self.zoom(sample['image_2'], label)
+            print(resize_img_2.shape)
             return {'image': resize_img, 'label': resize_label, 'image_2': resize_img_2, 'label_2': resize_label_2}
         else:
             return {'image': resize_img, 'label': resize_label}
