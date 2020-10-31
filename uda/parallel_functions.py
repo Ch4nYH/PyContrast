@@ -18,13 +18,15 @@ def train(model, model_ema, loader, optimizer, logger, saver, args, epoch, contr
 	for i, batch in enumerate(loader):
 		index = batch['index']
 		volume = batch['image'].cuda(args.local_rank, non_blocking = True)
+		print("Volume Shape:", volume.shape)
 		volume = volume.view((-1,) + volume.shape[2:])
-		print(volume.shape)
+		print("Volume Shape After View:", volume.shape)
 		if epoch > args.turnon:
-			volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
 			
+			volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
+			print("Volume 2 Shape:", volume2.shape)
 			volume2 = volume2.view((-1,) + volume2.shape[2:])
-			print(volume.shape)
+			print("Volume Shape 2 After View:", volume2.shape)
 			q = model(volume, pretrain=True)
 			with torch.no_grad():
 				k = model_ema(volume2, pretrain=True)
