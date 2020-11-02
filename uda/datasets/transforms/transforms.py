@@ -258,7 +258,9 @@ def build_transforms(args):
                         RandomContrast(),
                         #GaussianBlur(),
                         ToTensor()])
-        test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
+        #test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
+        #                ToTensor()])
+        test_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=48, is_binary=True),
                         ToTensor()])
     else:
         train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
