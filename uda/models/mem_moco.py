@@ -53,6 +53,33 @@ class BaseMoCo(nn.Module):
 
         return out
 
+    def _compute_4layer_logit(self, q, k, queue):
+        """
+        Args:
+          q: query/anchor feature
+          k: key feature
+          queue: memory buffer
+        """
+        # pos logit
+        bsz = q.shape[0]
+        pos = torch.bmm(q.view(bsz, 1, -1), k.view(bsz, -1, 1))
+        pos = pos.view(bsz, 1)
+
+        # neg logit
+        neg = torch.mm(queue, q.transpose(1, 0))
+        neg = neg.transpose(0, 1)
+        
+        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
+        all_length = neg.shape[1]
+        for i in range(neg.shape[0]):
+            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
+
+        out = torch.cat((pos, newneg), dim=1)
+        out = torch.div(out, self.T)
+        out = out.squeeze().contiguous()
+
+        return out
+
 
 class RGBMoCo(BaseMoCo):
     """Single Modal (e.g., RGB) MoCo-style cache"""
@@ -79,6 +106,46 @@ class RGBMoCo(BaseMoCo):
         logits = self._compute_logit(q, k, queue)
         if q_jig is not None:
             logits_jig = self._compute_logit(q_jig, k, queue)
+
+        # set label
+        labels = torch.zeros(bsz, dtype=torch.long).cuda()
+    
+        # update memory
+        all_k = all_k if all_k is not None else k
+        self._update_memory(all_k, self.memory)
+        #self._update_memory(torch.tensor([0,1,2,3] * int(all_k.size(0) / 4)).int(), self.memory_label)
+        self._update_pointer(all_k.size(0))
+
+        if q_jig is not None:
+            return logits, logits_jig, labels
+        else:
+            return logits, labels
+
+class RGBMoCoNew(BaseMoCo):
+    """Single Modal (e.g., RGB) MoCo-style cache"""
+    def __init__(self, n_dim, K=65536, T=0.07):
+        super(RGBMoCo, self).__init__(K, T)
+        # create memory queue
+        self.register_buffer('memory', torch.randn(K, n_dim))
+        self.register_buffer('memory_label', torch.randn(K, 1))
+        self.memory = F.normalize(self.memory)
+
+    def forward(self, q, k, q_jig=None, all_k=None):
+        """
+        Args:
+          q: query on current node
+          k: key on current node
+          q_jig: jigsaw query
+          all_k: gather of feats across nodes; otherwise use q
+        """
+        bsz = q.size(0)
+        k = k.detach()
+
+        # compute logit
+        queue = self.memory.clone().detach()
+        logits = self._compute_4layer_logit(q, k, queue)
+        if q_jig is not None:
+            logits_jig = self._compute_4layer_logit(q_jig, k, queue)
 
         # set label
         labels = torch.zeros(bsz, dtype=torch.long).cuda()
