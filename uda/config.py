@@ -46,5 +46,7 @@ def parse_args():
 	parser.add_argument('--increasing-coef', action="store_true")
 
 	parser.add_argument('--turnon', default=100, type=int)
+
+	parser.add_argument('--memory', default='default', type=str, choices=['default', '4layers'])
 	args = parser.parse_args()
 	return args
