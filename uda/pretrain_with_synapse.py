@@ -8,10 +8,8 @@ from utils.utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
 from pretrain_functions import pretrain, momentum_update
-from datasets.paths import get_paths
-from datasets.hdf5 import HDF5Dataset
-from datasets.dataset import build_dataset
 
+from datasets import build_dataset
 from torch.utils.data import DataLoader
 from models.vnet import VNet
 from models.mem_moco import RGBMoCo, RGBMoCoNew
@@ -19,10 +17,8 @@ from models.mem_moco import RGBMoCo, RGBMoCoNew
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
-apex = False
 
 args = parse_args()
-args.pretrain = True
 
 os.environ['MASTER_PORT'] = args.port
 torch.cuda.set_device(args.local_rank)
