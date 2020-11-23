@@ -44,7 +44,7 @@ feature_len = 256  #
 iter_num = 0
 sr_feature_size = 32
 
-train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, pretrain = args.pretrain, ssim = args.ssim)
+train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, pretrain = True, ssim = args.ssim)
 train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
 
 train_loader = torch.utils.data.DataLoader(
