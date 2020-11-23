@@ -14,7 +14,7 @@ from datasets.dataset import build_dataset
 
 from torch.utils.data import DataLoader
 from models.vnet import VNet
-from models.mem_moco import RGBMoCo, RGBMocoNew
+from models.mem_moco import RGBMoCo, RGBMoCoNew
 
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
