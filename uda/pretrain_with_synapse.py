@@ -48,12 +48,9 @@ feature_len = 256  #
 iter_num = 0
 sr_feature_size = 32
 
-train_dataset, val_dataset = build_dataset(args)
-args.dataset = 'synapse'
-train_dataset_2, val_dataset_2 = build_dataset(args)
+train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, pretrain = args.pretrain, ssim = args.ssim)
 train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
-train_sampler_2 = torch.utils.data.distributed.DistributedSampler(train_dataset_2, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
-    
+
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
     shuffle=False,
@@ -64,19 +61,8 @@ val_loader = torch.utils.data.DataLoader(
     val_dataset, batch_size=1, 
     num_workers=args.num_workers, pin_memory=True)
 
-train_loader_2 = torch.utils.data.DataLoader(
-    train_dataset_2, batch_size=args.batch_size, 
-    shuffle=False,
-    sampler = train_sampler_2,
-    num_workers=args.num_workers, pin_memory=True, drop_last = True)
-    
-val_loader_2 = torch.utils.data.DataLoader(
-    val_dataset_2, batch_size=1, 
-    num_workers=args.num_workers, pin_memory=True)
-
 model = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = True).cuda(args.local_rank)
 model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = True).cuda(args.local_rank)
-
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)

@@ -249,29 +249,7 @@ class GaussianBlur(object):
         sample['label'] = label
         return sample
 
-def build_transforms(args):
-    if args.pretrain:
-        train_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
-                        #RandomTranspose(),
-                        RandomRotate(),
-                        GaussianNoise(),
-                        RandomContrast(),
-                        #GaussianBlur(),
-                        ToTensor()])
-        #test_transforms = torchvision.transforms.Compose([RandomCropSlices(64, 4, pad=-1, is_binary=True),
-        #                ToTensor()])
-        test_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=48, is_binary=True),
-                        ToTensor()])
-    else:
-        train_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=-1, is_binary=True),
-                        RandomTranspose(),
-                        RandomRotate(),
-                        GaussianNoise(),
-                        #GaussianBlur(),
-                        ToTensor()])
-        test_transforms = torchvision.transforms.Compose([RandomCrop(64, 8, pad=48, is_binary=True),
-                        ToTensor()])
-    return train_transforms, test_transforms
+
 
 def get_jigsaw_transforms(args):
     '''
