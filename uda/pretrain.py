@@ -72,7 +72,7 @@ model_ema.load_state_dict(model.state_dict())
 print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
-contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
+contrast = RGBMoCo(128, K = 4096, T = 0.5).cuda(args.local_rank)
 criterion = torch.nn.CrossEntropyLoss()
 for epoch in range(args.start_epoch, args.epochs):
 	train_sampler.set_epoch(epoch)
