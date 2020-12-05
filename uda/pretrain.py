@@ -12,7 +12,7 @@ from datasets import build_dataset
 
 from torch.utils.data import DataLoader
 from models.vnet import VNet
-from models.mem_moco import RGBMoCo
+from models.mem_moco import RGBMoCo, RGBMoCoNew
 
 import torch.utils.data.distributed
 import torch.multiprocessing as mp
@@ -59,7 +59,12 @@ model_ema.load_state_dict(model.state_dict())
 print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
-contrast = RGBMoCo(128, K = 4096, T = args.temperature).cuda(args.local_rank)
+if args.sampling == 'default':
+    contrast = RGBMoCo(128, K = 4096, T = args.temperature).cuda(args.local_rank)
+elif args.sampling == 'layerwise':
+    contrast = RGBMoCoNew(128, K = 4096, T = args.temperature).cuda(args.local_rank)
+else:
+    raise ValueError("unsupported sampling method")
 criterion = torch.nn.CrossEntropyLoss()
 for epoch in range(args.start_epoch, args.epochs):
 	train_sampler.set_epoch(epoch)

@@ -68,6 +68,78 @@ class BaseMoCo(nn.Module):
         # neg logit
         neg = torch.mm(queue, q.transpose(1, 0))
         neg = neg.transpose(0, 1)
+        out = torch.cat((pos, neg), dim=1)
+        out = torch.div(out, self.T)
+        out = out.squeeze().contiguous()
+
+        return out
+
+
+class BaseMoCoNew(nn.Module):
+    """base class for MoCo-style memory cache"""
+    def __init__(self, K=65536, T=0.07):
+        super(BaseMoCo, self).__init__()
+        self.K = K
+        self.T = T
+        self.index = 0
+
+    def _update_pointer(self, bsz):
+        self.index = (self.index + bsz) % self.K
+
+    def _update_memory(self, k, queue):
+        """
+        Args:
+          k: key feature
+          queue: memory buffer
+        """
+        with torch.no_grad():
+            num_neg = k.shape[0]
+            out_ids = torch.arange(num_neg).cuda()
+            out_ids = torch.fmod(out_ids + self.index, self.K).long()
+            queue.index_copy_(0, out_ids, k)
+
+    def _compute_logit(self, q, k, queue):
+        """
+        Args:
+          q: query/anchor feature
+          k: key feature
+          queue: memory buffer
+        """
+        # pos logit
+        bsz = q.shape[0]
+        pos = torch.bmm(q.view(bsz, 1, -1), k.view(bsz, -1, 1))
+        pos = pos.view(bsz, 1)
+
+        # neg logit
+        neg = torch.mm(queue, q.transpose(1, 0))
+        neg = neg.transpose(0, 1)
+        
+        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
+        all_length = neg.shape[1]
+        for i in range(neg.shape[0]):
+            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
+
+        out = torch.cat((pos, neg), dim=1)
+        out = torch.div(out, self.T)
+        out = out.squeeze().contiguous()
+
+        return out
+
+    def _compute_4layer_logit(self, q, k, queue):
+        """
+        Args:
+          q: query/anchor feature
+          k: key feature
+          queue: memory buffer
+        """
+        # pos logit
+        bsz = q.shape[0]
+        pos = torch.bmm(q.view(bsz, 1, -1), k.view(bsz, -1, 1))
+        pos = pos.view(bsz, 1)
+
+        # neg logit
+        neg = torch.mm(queue, q.transpose(1, 0))
+        neg = neg.transpose(0, 1)
         
         newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
         all_length = neg.shape[1]
@@ -121,7 +193,7 @@ class RGBMoCo(BaseMoCo):
         else:
             return logits, labels
 
-class RGBMoCoNew(BaseMoCo):
+class RGBMoCoNew(BaseMoCoNew):
     """Single Modal (e.g., RGB) MoCo-style cache"""
     def __init__(self, n_dim, K=65536, T=0.07):
         super(RGBMoCo, self).__init__(K, T)
@@ -153,7 +225,6 @@ class RGBMoCoNew(BaseMoCo):
         # update memory
         all_k = all_k if all_k is not None else k
         self._update_memory(all_k, self.memory)
-        #self._update_memory(torch.tensor([0,1,2,3] * int(all_k.size(0) / 4)).int(), self.memory_label)
         self._update_pointer(all_k.size(0))
 
         if q_jig is not None:
