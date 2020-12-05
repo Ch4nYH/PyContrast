@@ -3,8 +3,9 @@ from .transforms import RandomRotate, GaussianNoise, RandomContrast, ToTensor, R
     RandomCropSlices, RandomCrop
 
 
-def build_transforms(pretrain = False):
-    if pretrain:
+def build_transforms(sampling = 'default'):
+    if sampling == 'layerwise':
+        print("using layerwise sampling")
         train_transforms = torchvision.transforms.Compose([
                         RandomCropSlices(64, 4, pad=-1, is_binary=True),
                         RandomRotate(),
@@ -15,7 +16,8 @@ def build_transforms(pretrain = False):
         test_transforms = torchvision.transforms.Compose([
                         RandomCrop(64, 8, pad=48, is_binary=True),
                         ToTensor()])
-    else:
+    elif sampling == 'default':
+        print("using default sampling")
         train_transforms = torchvision.transforms.Compose([
                         RandomCrop(64, 8, pad=-1, is_binary=True),
                         RandomTranspose(),
@@ -26,4 +28,6 @@ def build_transforms(pretrain = False):
         test_transforms = torchvision.transforms.Compose([
                         RandomCrop(64, 8, pad=48, is_binary=True),
                         ToTensor()])
+    else:
+        raise ValueError("unsupported sampling method")
     return train_transforms, test_transforms

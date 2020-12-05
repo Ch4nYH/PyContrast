@@ -36,17 +36,7 @@ if not os.path.exists(root_path):
 	os.mkdir(os.path.join(root_path, "model"))
 
 base_lr = args.lr  # base learning rate
-
-max_iterations = 40000
-cell_size = 96  # size of volume we crop patch from
-patch_size = 64
-puzzle_config = 3  # 2 or 3 for 2X2X2 or 3X3X3 puzzle
-puzzle_num = puzzle_config ** 3
-feature_len = 256  #
-iter_num = 0
-sr_feature_size = 32
-
-train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list)
+train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, sampling = args.sampling)
 train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(',')), rank = args.local_rank)
     
 train_loader = torch.utils.data.DataLoader(
@@ -63,7 +53,6 @@ model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = Tr
 
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
-#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
 model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
 model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
 model_ema.load_state_dict(model.state_dict())
