@@ -21,6 +21,7 @@ def build_transforms(pretrain = False):
                         RandomTranspose(),
                         RandomRotate(),
                         GaussianNoise(),
+                        RandomContrast(),
                         ToTensor()])
         test_transforms = torchvision.transforms.Compose([
                         RandomCrop(64, 8, pad=48, is_binary=True),
