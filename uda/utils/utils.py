@@ -80,11 +80,10 @@ class Saver(object):
         self.best_dice = 0
         self.save_freq = save_freq
     def save(self, epoch, states, test_dice):
-        if epoch % self.save_freq == 0:
-            torch.save(states, os.path.join(self.path, 'model', 'checkpoint_{}.pth.tar'.format(epoch)))
-            if test_dice > self.best_dice:
-                torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))
-                self.best_dice = test_dice
+        torch.save(states, os.path.join(self.path, 'model', 'checkpoint.pth.tar'))
+        if test_dice > self.best_dice:
+            torch.save(states, os.path.join(self.path, 'model', 'checkpoint_best.pth.tar'))
+            self.best_dice = test_dice
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
