@@ -56,7 +56,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		acc_meter.update(update_acc[0], args.batch_size)
 		acc_jig_meter.update(update_acc_jig[0], args.batch_size)
 		momentum_update(model, model_ema)
-		if i % args.print_freq == 0 and args.gpu == 0:
+		if i % args.print_freq == 0 and args.local_rank == 0:
 			tqdm.write('Train: [{0}][{1}/{2}]\t'
 						  'l_I {loss.val:.3f} ({loss.avg:.3f})\t'
 						  'a_I {acc.val:.3f} ({acc.avg:.3f})\t'
@@ -64,11 +64,11 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 						  'a_J {acc_jig.val:.3f} ({acc_jig.avg:.3f})'.format(
 						   epoch, i + 1, len(loader), loss=loss_meter, acc=acc_meter,
 						   loss_jig=loss_jig_meter, acc_jig=acc_jig_meter))
-		if args.gpu == 0:
+		if args.local_rank == 0:
 			logger.log("pretrain/loss", update_loss.item())
 			logger.log("pretrain/acc", update_acc[0])
 			logger.step()
-	if args.gpu == 0:
+	if args.local_rank == 0:
 		saver.save(epoch, {
 			'state_dict': model_ema.state_dict(),
 			'acc': acc_meter.avg,
