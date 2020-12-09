@@ -69,15 +69,14 @@ class DatasetInstance(Dataset):
 
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
-            if self.two_crop:
-                sample2 = self.transform(sample_pre_transform)
-                sample['image_2'] = sample2['image']
-                sample['label_2'] = sample2['label']
+            sample2 = self.transform(sample_pre_transform)
+            sample['image_2'] = sample2['image']
+            sample['label_2'] = sample2['label']
         else:
             img = image
 
         if self.use_jigsaw:
-             jigsaw_img = self.jigsaw_transform(sample_pre_transform)
+            jigsaw_img = self.jigsaw_transform(sample_pre_transform)
 
         sample['index'] = index
         return sample
