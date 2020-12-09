@@ -21,7 +21,7 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 			m.train()
 	model_ema.apply(set_bn_train)
 	scaler = torch.cuda.amp.GradScaler() 
-	for i, batch in enumerate(loader):
+	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
 		volume = batch['image'].cuda(args.local_rank, non_blocking = True)
 		volume = volume.view((-1,) + volume.shape[2:])
