@@ -41,39 +41,11 @@ class BaseMoCo(nn.Module):
         # neg logit
         neg = torch.mm(queue, q.transpose(1, 0))
         neg = neg.transpose(0, 1)
-        
-        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
-        all_length = neg.shape[1]
-        for i in range(neg.shape[0]):
-            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
-
         out = torch.cat((pos, neg), dim=1)
         out = torch.div(out, self.T)
         out = out.squeeze().contiguous()
 
         return out
-
-    def _compute_4layer_logit(self, q, k, queue):
-        """
-        Args:
-          q: query/anchor feature
-          k: key feature
-          queue: memory buffer
-        """
-        # pos logit
-        bsz = q.shape[0]
-        pos = torch.bmm(q.view(bsz, 1, -1), k.view(bsz, -1, 1))
-        pos = pos.view(bsz, 1)
-
-        # neg logit
-        neg = torch.mm(queue, q.transpose(1, 0))
-        neg = neg.transpose(0, 1)
-        out = torch.cat((pos, neg), dim=1)
-        out = torch.div(out, self.T)
-        out = out.squeeze().contiguous()
-
-        return out
-
 
 class BaseMoCoNew(nn.Module):
     """base class for MoCo-style memory cache"""
@@ -98,33 +70,6 @@ class BaseMoCoNew(nn.Module):
             out_ids = torch.fmod(out_ids + self.index, self.K).long()
             queue.index_copy_(0, out_ids, k)
 
-    def _compute_logit(self, q, k, queue):
-        """
-        Args:
-          q: query/anchor feature
-          k: key feature
-          queue: memory buffer
-        """
-        # pos logit
-        bsz = q.shape[0]
-        pos = torch.bmm(q.view(bsz, 1, -1), k.view(bsz, -1, 1))
-        pos = pos.view(bsz, 1)
-
-        # neg logit
-        neg = torch.mm(queue, q.transpose(1, 0))
-        neg = neg.transpose(0, 1)
-        
-        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
-        all_length = neg.shape[1]
-        for i in range(neg.shape[0]):
-            newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
-
-        out = torch.cat((pos, neg), dim=1)
-        out = torch.div(out, self.T)
-        out = out.squeeze().contiguous()
-
-        return out
-
     def _compute_4layer_logit(self, q, k, queue):
         """
         Args:
@@ -141,7 +86,7 @@ class BaseMoCoNew(nn.Module):
         neg = torch.mm(queue, q.transpose(1, 0))
         neg = neg.transpose(0, 1)
         
-        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3))
+        newneg = torch.zeros((neg.shape[0], neg.shape[1] // 4 * 3), device=neg.device)
         all_length = neg.shape[1]
         for i in range(neg.shape[0]):
             newneg[i, :] =  neg[i, list(set(range(all_length)) - set(range(i % 4, all_length, 4)))]
