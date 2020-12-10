@@ -78,7 +78,7 @@ class BaseMoCo(nn.Module):
 class BaseMoCoNew(nn.Module):
     """base class for MoCo-style memory cache"""
     def __init__(self, K=65536, T=0.07):
-        super(BaseMoCo, self).__init__()
+        super(BaseMoCoNew, self).__init__()
         self.K = K
         self.T = T
         self.index = 0
