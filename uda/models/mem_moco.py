@@ -196,7 +196,7 @@ class RGBMoCo(BaseMoCo):
 class RGBMoCoNew(BaseMoCoNew):
     """Single Modal (e.g., RGB) MoCo-style cache"""
     def __init__(self, n_dim, K=65536, T=0.07):
-        super(RGBMoCo, self).__init__(K, T)
+        super(RGBMoCoNew, self).__init__(K, T)
         # create memory queue
         self.register_buffer('memory', torch.randn(K, n_dim))
         self.register_buffer('memory_label', torch.randn(K, 1))
