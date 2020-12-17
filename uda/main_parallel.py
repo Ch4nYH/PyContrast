@@ -8,14 +8,12 @@ from utils.utils import dice, Logger, Saver, adjust_learning_rate
 from config import parse_args
 from datetime import datetime
 from parallel_functions import train, validate
-from datasets.paths import get_paths
-from datasets.hdf5 import HDF5Dataset
-from datasets.dataset import build_dataset
+from datasets import build_dataset
 
 from torch.utils.data import DataLoader
 from models.vnet_parallel import VNet
 from torch.nn.parallel import DistributedDataParallel as DDP
-from models.mem_moco import RGBMoCo
+from models.mem_moco import RGBMoCo, RGBMoCoNew
 
 def main():
 
@@ -30,20 +28,9 @@ def main():
         os.mkdir(root_path)
         os.mkdir(os.path.join(root_path, "log"))
         os.mkdir(os.path.join(root_path, "model"))
-    
-    base_lr = args.lr  # base learning rate
-    batch_size = 1
-    max_iterations = 20000
 
-    cell_size = 96  # size of volume we crop patch from
-    patch_size = 64
-    puzzle_config = 3  # 2 or 3 for 2X2X2 or 3X3X3 puzzle
-    puzzle_num = puzzle_config ** 3
-    feature_len = 256  #
-    iter_num = 0
-    sr_feature_size = 32
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-    train_dataset, val_dataset = build_dataset(args)
+    train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, sampling = args.sampling)
     args.world_size = len(args.gpu.split(","))
     if args.world_size > 1:
         os.environ['MASTER_PORT'] = args.port
@@ -71,15 +58,20 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
     if args.world_size > 1:
         model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
-
+        model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+    
     model.train()
-    model_ema = DDP(model_ema, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
     model_ema.load_state_dict(model.state_dict())
     print("Loaded weights")
 
     logger = Logger(root_path)
     saver = Saver(root_path, save_freq=args.save_freq)
-    contrast = RGBMoCo(128, K = 4096).cuda(args.local_rank)
+    if args.sampling == 'default':
+        contrast = RGBMoCo(128, K = 4096, T = args.temperature).cuda(args.local_rank)
+    elif args.sampling == 'layerwise':
+        contrast = RGBMoCoNew(128, K = 4096, T = args.temperature).cuda(args.local_rank)
+    else:
+        raise ValueError("unsupported sampling method")
     criterion = torch.nn.CrossEntropyLoss()
 
     flag = False
@@ -89,8 +81,7 @@ def main():
         validate(model_ema, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
         if not flag and args.turnon > 0 and epoch >= args.turnon:
-            args.pretrain = True
-            train_dataset, val_dataset = build_dataset(args)
+            train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, sampling = args.sampling)
             train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
             train_loader = torch.utils.data.DataLoader(
                 train_dataset, batch_size=args.batch_size, 
