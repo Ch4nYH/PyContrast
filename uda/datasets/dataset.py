@@ -32,6 +32,8 @@ class DatasetInstance(Dataset):
         for name, path in zip(dataset_names, root_dirs):
             self.root_dir[name] = path
 
+        print(self.root_dir)
+
         self.transform = transform
 
         self.two_crop = True
