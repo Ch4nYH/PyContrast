@@ -21,12 +21,14 @@ class DatasetInstance(Dataset):
         assert len(list_files) > 0, "Must provide lists!"
         self.image_list = []
         self.lengths = []
+        print(list_file)
         for list_file in list_files:
             image_list = open(list_file).readlines()
             image_list = [os.path.basename(line.strip()) for line in image_list]
             image_list = [line for line in image_list if line.endswith('.h5')]
             self.lengths.append(len(image_list))
             self.image_list.extend(image_list)
+        
 
         self.root_dir = {}
         for name, path in zip(dataset_names, root_dirs):
