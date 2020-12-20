@@ -21,7 +21,7 @@ class DatasetInstance(Dataset):
         assert len(list_files) > 0, "Must provide lists!"
         self.image_list = []
         self.lengths = []
-        print(list_file)
+        print(list_files)
         for list_file in list_files:
             image_list = open(list_file).readlines()
             image_list = [os.path.basename(line.strip()) for line in image_list]
