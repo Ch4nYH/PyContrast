@@ -1,7 +1,6 @@
 import os
 import time
 import torch
-import dateutil.tz
 
 from tqdm import tqdm
 from utils.utils import dice, Logger, Saver, adjust_learning_rate

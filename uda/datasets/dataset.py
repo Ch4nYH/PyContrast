@@ -92,6 +92,7 @@ class DatasetInstanceWithSSIM(DatasetInstance):
         need_non_zero_label, is_binary, jigsaw_transform, dataset=dataset)
         self.num_of_samples = num_of_samples
         self.split = split
+        self.jigsaw_transform = jigsaw_transform
     def __getitem__(self, index):
         img_name = os.path.join(self.root_dir, self.image_list[index])
         data = h5py.File(img_name, 'r')
@@ -100,7 +101,7 @@ class DatasetInstanceWithSSIM(DatasetInstance):
         
         data.close()
         sample_pre_transform = {'image': image, 'label': label}
-
+        sample={}
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
             best_ssim = 0
@@ -124,12 +125,19 @@ class DatasetInstanceWithSSIM(DatasetInstance):
             sample['label_2'] = new_samples[best_j]['label']
         else:
             img = image
-
-        if self.use_jigsaw:
-             jigsaw_img = self.jigsaw_transform(sample_pre_transform)
+        
+        if self.jigsaw_transform is not None:
+            cell_size = 36 # size of volume we crop patch from
+            patch_size = 32
+            puzzle_config = 2 # 2 or 3 for 2X2X2 or 3X3X3 puzzle
+            puzzle_num = puzzle_config ** 3
+            jigsaw_sample = self.jigsaw_transform(sample_pre_transform)
 
 
         sample['index'] = index
-        return sample
+        if self.jigsaw_transform is not None:
+            return sample, jigsaw_sample
+        else:
+            return sample
     
     
