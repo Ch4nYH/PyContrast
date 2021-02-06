@@ -82,7 +82,7 @@ class RandomCrop(object):
 
             index = 0
             for i in range(self.puzzle_num):
-                for j in xrange(i + 1, self.puzzle_num):
+                for j in range(i + 1, self.puzzle_num):
                     gap = u_label[j] - u_label[i]
                     if   gap ==  1:
                         b_label[index] = 0

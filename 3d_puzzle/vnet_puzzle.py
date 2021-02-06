@@ -251,7 +251,7 @@ class PuzzleNet(nn.Module):
             # binary loss
             binary_list = []
             for i in range(self.puzzle_num):
-                for j in xrange(i + 1, self.puzzle_num):
+                for j in range(i + 1, self.puzzle_num):
                     feature_pair = torch.cat([feature_list[i], \
                                               feature_list[j]], dim=1)
                     b_out1 = self.binary_fc1(feature_pair)
