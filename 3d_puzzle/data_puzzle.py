@@ -6,6 +6,7 @@ from torchvision import transforms, utils
 from torch.autograd import Variable
 import torch.nn.functional as F
 import random
+import h5py
 
 class NIHDataset(Dataset):
     """ NIH Dataset """
@@ -27,7 +28,7 @@ class NIHDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, 
                                 self.image_list[idx].strip())
-        image = np.load(img_name)['image'].astype(np.float32)
+        image = np.array(h5py.File(img_name, 'r')['image']).astype(np.float32)
 
         # data processing
         sample = {'image': image}
