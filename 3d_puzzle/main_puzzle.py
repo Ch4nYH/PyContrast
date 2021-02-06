@@ -12,11 +12,11 @@ from utils_puzzle import unary_loss, binary_loss
 from data_puzzle import DataLoader, NIHDataset, RandomCrop, ToTensor
 import numpy as np
 
-train_list_path = './lists/train_fd0.list'
-train_data_path = '/DATA/disk1/Pancreas/nih_pad20/'
+train_list_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/train.lst'
+train_data_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/train'
 
-test_data_path = '/DATA/disk1/Pancreas/'
-test_list_path = './lists/train_fd0.list'
+test_data_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/test'
+test_list_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/test.lst'
 
 snapshot_path = 'models' # where to save your models
 snapshot_prefix = 'puzzle'
@@ -138,7 +138,7 @@ if __name__ == "__main__":
                     volume_batch.cuda(), label_batch.cuda()
 
                 output_list, hungarian_list = net(volume_batch, label_batch)
-                loss = puzzle_loss(output_list, hungarian_list)
+                loss = unary_loss(output_list, hungarian_list)
                 print(hungarian_list)
 
     else:

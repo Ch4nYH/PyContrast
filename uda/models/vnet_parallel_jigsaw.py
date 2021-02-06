@@ -132,7 +132,7 @@ class OutputTransition(nn.Module):
 class VNet(nn.Module):
     # the number of convolutions in each layer corresponds
     # to what is in the actual prototxt, not the intent
-    def __init__(self, n_channels, n_classes, input_size = 128, elu=False, pretrain = False, feat_dim=128, jigsaw = False):
+    def __init__(self, n_channels, n_classes, input_size = 64, elu=False, pretrain = False, feat_dim=128, jigsaw = False):
         super(VNet, self).__init__()
         self.in_tr = InputTransition(n_channels, elu)
         self.down_tr32 = DownTransition(16, 1, elu)
@@ -146,18 +146,14 @@ class VNet(nn.Module):
         self.out_tr = OutputTransition(32, elu, n_classes)
         self.pretrain = pretrain
         self.jigsaw = jigsaw
-        if self.pretrain:
-            self.head = nn.Sequential(
-                nn.Linear(input_size * input_size // 2, input_size * input_size // 2),
-                nn.ReLU(inplace=True),
-                nn.Linear(input_size * input_size // 2, feat_dim),
-                Normalize(2)
-            )
+        
+        self.head = nn.Sequential(
+            nn.Linear(16384, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, 7),
+            nn.LogSoftmax()
+        )
 
-            if self.jigsaw:
-                self.head_jig = JigsawHead(dim_in=int(16384),
-                                   dim_out=feat_dim,
-                                   head="mlp")
     def normal_forward(self, x):
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
@@ -170,9 +166,6 @@ class VNet(nn.Module):
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
         return out, out256
-
-    def forward(self, x):
-        return self.normal_forward(x)
 
     def encode(self, x):
         out16 = self.in_tr(x)
@@ -197,3 +190,8 @@ class VNet(nn.Module):
         else:
             return feat
         
+    def forward(self, x, pretrain=False):
+        if pretrain:
+            return self.pretrain_forward(x)
+        else:
+            return self.normal_forward(x)

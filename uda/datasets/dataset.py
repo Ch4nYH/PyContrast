@@ -74,15 +74,15 @@ class DatasetInstance(Dataset):
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
             sample2 = self.transform(sample_pre_transform)
-            sample['image_2'] = sample2['image']
-            sample['label_2'] = sample2['label']
+
+            for key in sample.keys():
+                
+                sample[key + '_2'] = sample2[key]
         else:
             img = image
 
-        if self.use_jigsaw:
-            jigsaw_img = self.jigsaw_transform(sample_pre_transform)
-
         sample['index'] = index
+        
         return sample
 
 class DatasetInstanceWithSSIM(DatasetInstance):
@@ -127,10 +127,6 @@ class DatasetInstanceWithSSIM(DatasetInstance):
             img = image
         
         if self.jigsaw_transform is not None:
-            cell_size = 36 # size of volume we crop patch from
-            patch_size = 32
-            puzzle_config = 2 # 2 or 3 for 2X2X2 or 3X3X3 puzzle
-            puzzle_num = puzzle_config ** 3
             jigsaw_sample = self.jigsaw_transform(sample_pre_transform)
 
 
@@ -141,3 +137,73 @@ class DatasetInstanceWithSSIM(DatasetInstance):
             return sample
     
     
+
+class DatasetInstanceJigsaw(Dataset):
+
+    def __init__(self, list_files, root_dirs, dataset_names, transform=None, 
+        need_non_zero_label = True, is_binary = False, jigsaw_transform = None, ):
+
+        assert len(list_files) > 0, "Must provide lists!"
+        self.image_list = []
+        self.lengths = []
+        print(list_files)
+        for list_file in list_files:
+            image_list = open(list_file).readlines()
+            image_list = [os.path.basename(line.strip()) for line in image_list]
+            image_list = [line for line in image_list if line.endswith('.h5')]
+            self.lengths.append(len(image_list))
+            self.image_list.extend(image_list)
+        
+
+        self.root_dir = {}
+        for name, path in zip(dataset_names, root_dirs):
+            self.root_dir[name] = path
+
+        print(self.root_dir)
+
+        self.transform = transform
+
+        self.two_crop = True
+        self.use_jigsaw = False #TODO
+        self.datasets = dataset_names
+        
+        self.data_name = []
+        for (d, l) in zip(self.datasets, self.lengths):
+            print('{}: {} images'.format(d, l))
+            self.data_name.extend([d] * l)
+
+
+    def __len__(self):
+
+        return len(self.image_list)
+
+    def __getitem__(self, index):
+        img_name = os.path.join(self.root_dir[self.data_name[index]], self.image_list[index])
+        data = h5py.File(img_name, 'r')
+        image = np.array(data['image'], dtype=np.float32) 
+        label = np.array(data['label'])
+        
+        data.close()
+        sample_pre_transform = {'image': image, 'label': label}
+        
+
+        if self.data_name[index] == 'synapse':
+            image = torch.from_numpy(image)
+            shape = list(image.shape)
+            shape[0] *= 3
+            image = image.reshape((1,1,)+image.shape)
+            image = F.interpolate(image, size = tuple(shape), mode='trilinear')
+            image = image[0,0,:,:,:]
+            image = image.numpy()
+
+        if self.transform is not None:
+            sample = self.transform(sample_pre_transform)
+            sample2 = self.transform(sample_pre_transform)
+            sample['image_2'] = sample2['image']
+            sample['label_2'] = sample2['label']
+        else:
+            img = image
+
+        sample['index'] = index
+        
+        return sample

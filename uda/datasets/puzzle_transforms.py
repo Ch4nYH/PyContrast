@@ -12,6 +12,7 @@ class RandomCrop(object):
 
     def __call__(self, sample):
         image = sample['image']
+        label = sample['label']
         (w, h, d) = image.shape
 
         w_c = np.random.randint(0, w - self.cell_size * self.puzzle_config + 1)
@@ -19,6 +20,7 @@ class RandomCrop(object):
         d_c = np.random.randint(0, d - self.cell_size * self.puzzle_config + 1)
 
         patch_list = []
+        label_list = []
         for i_w in range(self.puzzle_config):
             for i_h in range(self.puzzle_config):
                 for i_d in range(self.puzzle_config):
@@ -33,12 +35,17 @@ class RandomCrop(object):
                     patch_list.append(image[w_start : w_start + self.patch_size, \
                                             h_start : h_start + self.patch_size, \
                                             d_start : d_start + self.patch_size])
+                    patch_list.append(label[w_start : w_start + self.patch_size, \
+                                            h_start : h_start + self.patch_size, \
+                                            d_start : d_start + self.patch_size])
 
         u_label = np.random.permutation(self.puzzle_num)
         patch_list_disordered = [patch_list[i] for i in list(u_label)]
+        label_list_disordered = [label_list[i] for i in list(u_label)]
+
 
         image = np.stack(patch_list_disordered, 0)
-
+        label = np.stack(label_list_disordered, 0)
         if self.flag_pair:
             b_label = np.zeros((self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
 
@@ -61,9 +68,9 @@ class RandomCrop(object):
                     else:
                         b_label[index] = 6
                     index += 1
-            return {'image' : image, 'u_label' : u_label, 'b_label' : b_label}
+            return {'image' : image, 'label': label, 'u_label' : u_label, 'b_label' : b_label}
         else:
-            return {'image' : image, 'u_label' : u_label}
+            return {'image' : image, 'label': label, 'u_label' : u_label}
 
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
@@ -71,15 +78,17 @@ class ToTensor(object):
         self.flag_pair = flag_pair
 
     def __call__(self, sample):
-        image, u_label = sample['image'], sample['u_label']
+        image, label, u_label = sample['image'], sample['label'], sample['u_label']
         image = image.reshape(image.shape[0], 1, 
                               image.shape[1], image.shape[2], image.shape[3])
         if self.flag_pair:
             b_label = sample['b_label']
             return {'image'   : torch.from_numpy(image), \
+                    'label'   : torch.from_numpy(label), \
                     'u_label' : torch.from_numpy(u_label), \
                     'b_label' : torch.from_numpy(b_label)}
         else: 
             return {'image'   : torch.from_numpy(image), \
+                    'label'   : torch.from_numpy(label), \
                     'u_label' : torch.from_numpy(u_label)}
 
