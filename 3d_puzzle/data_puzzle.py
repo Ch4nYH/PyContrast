@@ -26,7 +26,7 @@ class NIHDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, 
-                                self.image_list[idx])
+                                self.image_list[idx].strip())
         image = np.load(img_name)['image'].astype(np.float32)
 
         # data processing
