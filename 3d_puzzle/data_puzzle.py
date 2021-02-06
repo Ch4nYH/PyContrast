@@ -28,7 +28,8 @@ class NIHDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir, 
                                 self.image_list[idx].strip())
-        image = np.array(h5py.File(img_name, 'r')['image']).astype(np.float32)
+        data = h5py.File(img_name, 'r')
+        image = np.array(data['raw']).astype(np.float32)
 
         # data processing
         sample = {'image': image}
