@@ -25,7 +25,7 @@ class NIHDataset(Dataset):
         return len(self.image_list)
 
     def __getitem__(self, idx):
-        img_name = os.path.join(self.root_dir, self.image_list[idx].split('.')[0] + '.npz')
+        img_name = os.path.join(self.root_dir, self.image_list[idx].strip())
         #img_name = os.path.join(self.root_dir, self.image_list[idx].split('.')[0] + '.npz')
         image = np.load(img_name)['image'].astype(np.float32)
         label = np.load(img_name)['label'].astype(np.float32)
