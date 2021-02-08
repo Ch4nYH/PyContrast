@@ -14,11 +14,11 @@ import h5py
 
 current_fold = 0
 
-list_path = './lists/train_fd0.list'
-train_data_path = '/export/ccvl12b/datasets/nih_pancreas/nih_pad32/'
-test_data_path = '/export/ccvl12b/datasets/nih_pancreas/test'
+list_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/train_processed_aug.lst'
+train_data_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/train_processed_aug'
 
-test_list_path = './lists/test_fd0.list'
+test_data_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/test'
+test_list_path = '/ccvl/net/ccvl15/shuhao/domain_adaptation/datasets/nih_pancreas/test.lst'
 
 snapshot_path = 'models/'
 snapshot_prefix = 'vnet_fd' + str(current_fold)
@@ -35,6 +35,19 @@ base_lr = 1e-2 # base learning rate
 if __name__ == "__main__":
     net = VNet(1024).cuda()
     
+    puzzle_state_dict = sys.argv[3]
+    new_puzzle_state_dict = {}
+
+    for key in puzzle_state_dict:
+        if key.startswith('vnet.'):
+            new_puzzle_state_dict[key[4:]] = puzzle_state_dict[key]
+        
+    state_dict = net.state_dict()
+    state_dict.update(new_puzzle_state_dict)
+    net.load_state_dict(state_dict)
+
+    
+
     if sys.argv[2] == 'train':
         net_parallel = nn.DataParallel(net)
         dataset = NIHDataset(list_file = list_path, 
