@@ -37,6 +37,8 @@ def train(model, loader, optimizer, logger, args, epoch, print_freq = 10):
 
 	model.eval()
 	dices = []
+
+
 def validate(model, loader, optimizer, logger, saver, args, epoch):
 	dices = []
 	for i, batch in enumerate(loader):

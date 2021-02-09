@@ -145,21 +145,24 @@ class VNet(nn.Module):
         self.up_tr32 = UpTransition(64, 32, 1, elu)
         self.out_tr = OutputTransition(32, elu, n_classes)
         self.pretrain = pretrain
-        self.jigsaw = jigsaw
         
-        self.head = nn.Sequential(
-            nn.Linear(16384, 4096),
-            nn.ReLU(inplace=True),
-            nn.Linear(4096, 7),
-            nn.LogSoftmax()
+        self.unary_fc = nn.Sequential(
+            nn.Linear(1024 * 8, 4096),
+            nn.Linear(4096, 8),
         )
 
-    def normal_forward(self, x):
+        self.binary_fc = nn.Sequential(
+            nn.Linear(1024 * 2, 512),
+            nn.Linear(512, 7)
+        )
+
+    def normal_forward(self, x, u_label, b_label):
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
         out64 = self.down_tr64(out32)
         out128 = self.down_tr128(out64)
         out256 = self.down_tr256(out128)
+
         out = self.up_tr256(out256, out128)
         out = self.up_tr128(out, out64)
         out = self.up_tr64(out, out32)

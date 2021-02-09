@@ -1,6 +1,6 @@
 import torchvision
 from .transforms import RandomRotate, GaussianNoise, RandomContrast, ToTensor, RandomTranspose, \
-    RandomCropSlices, RandomCrop
+    RandomCropSlices, RandomCrop, RandomCropJigsaw
 
 
 def build_transforms(sampling = 'default'):
@@ -30,4 +30,18 @@ def build_transforms(sampling = 'default'):
                         ToTensor()])
     else:
         raise ValueError("unsupported sampling method")
+    return train_transforms, test_transforms
+
+def build_jigsaw_transform():
+    train_transforms = torchvision.transforms.Compose([
+                        RandomCropJigsaw(),
+                        RandomTranspose(),
+                        RandomRotate(),
+                        GaussianNoise(),
+                        RandomContrast(),
+                        ToTensor()])
+    test_transforms = torchvision.transforms.Compose([
+                        RandomCrop(64, 8, pad=48, is_binary=True),
+                        ToTensor()])
+    
     return train_transforms, test_transforms

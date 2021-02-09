@@ -76,7 +76,6 @@ class DatasetInstance(Dataset):
             sample2 = self.transform(sample_pre_transform)
 
             for key in sample.keys():
-                
                 sample[key + '_2'] = sample2[key]
         else:
             img = image
@@ -164,7 +163,6 @@ class DatasetInstanceJigsaw(Dataset):
         self.transform = transform
 
         self.two_crop = True
-        self.use_jigsaw = False #TODO
         self.datasets = dataset_names
         
         self.data_name = []
@@ -199,10 +197,10 @@ class DatasetInstanceJigsaw(Dataset):
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
             sample2 = self.transform(sample_pre_transform)
-            sample['image_2'] = sample2['image']
-            sample['label_2'] = sample2['label']
+            for key in sample.keys():
+                sample[key + '_2'] = sample2[key]
         else:
-            img = image
+            sample = sample_pre_transform
 
         sample['index'] = index
         

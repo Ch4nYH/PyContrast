@@ -16,7 +16,7 @@ class RandomContrast(object):
         self.per_channel = per_channel
         
     def __call__(self, sample):
-        image, label = sample['image'], sample['label']
+        image = sample['image'] 
         if not self.per_channel:
             mn = image.mean()
             if self.preserve_range:
@@ -198,15 +198,16 @@ class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
-        image, label = sample['image'], sample['label']
-        if image.ndim >= 5:                                                     # already has channel dim
-            image = torch.from_numpy(image.astype(np.float32))
-        else:
-            image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
-        label = torch.from_numpy(label.astype(np.float32)).unsqueeze(1)
-        
-        sample['image'] = image
-        sample['label'] = label
+
+        for key in sample.keys():
+            image = sample[key]
+
+            if image.ndim >= 5:                                                     # already has channel dim
+                image = torch.from_numpy(image.astype(np.float32))
+            else:
+                image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
+
+            sample[key] = torch.from_numpy(image)
 
         return sample
 
@@ -250,18 +251,77 @@ class GaussianBlur(object):
         return sample
 
 
+# Begin Jigsaw Transformations
 
-def get_jigsaw_transforms(args):
-    '''
-    jigsaw_transform = transforms.Compose([
-        transforms.RandomResizedCrop(255, scale=(0.6, 1)),
-        transforms.RandomHorizontalFlip(),
-        JigsawCrop(),
-        StackTransform(transforms.Compose([
-            color_transfer,
-            transforms.ToTensor(),
-            normalize,
-        ]))
-    ])
-    '''
-    return None
+class RandomCropJigsaw(object):
+    def __init__(self, cell_size=96, patch_size=64, puzzle_config=2, flag_pair=True, is_binary=True):
+        self.cell_size = cell_size
+        self.patch_size = patch_size
+        self.puzzle_config = puzzle_config
+        self.flag_pair = flag_pair
+
+        self.puzzle_num = self.puzzle_config ** 3
+        self.is_binary = is_binary
+    def __call__(self, sample):
+        image = sample['image']
+        label = sample['label']
+        if self.is_binary:
+            label[label > 1] = 0
+        (w, h, d) = image.shape
+
+        w_c = np.random.randint(0, w - self.cell_size * self.puzzle_config + 1)
+        h_c = np.random.randint(0, h - self.cell_size * self.puzzle_config + 1)
+        d_c = np.random.randint(0, d - self.cell_size * self.puzzle_config + 1)
+
+        patch_list = []
+        label_list = []
+        for i_w in range(self.puzzle_config):
+            for i_h in range(self.puzzle_config):
+                for i_d in range(self.puzzle_config):
+                    [w_p, h_p, d_p] = \
+                        np.random.randint(0,
+                                          self.cell_size - self.patch_size + 1,
+                                          size=(3))
+
+                    w_start = w_c + i_w * self.cell_size + w_p
+                    h_start = h_c + i_h * self.cell_size + h_p
+                    d_start = d_c + i_d * self.cell_size + d_p
+                    patch_list.append(image[w_start : w_start + self.patch_size, \
+                                            h_start : h_start + self.patch_size, \
+                                            d_start : d_start + self.patch_size])
+                    label_list.append(label[w_start : w_start + self.patch_size, \
+                                            h_start : h_start + self.patch_size, \
+                                            d_start : d_start + self.patch_size])
+
+        u_label = np.random.permutation(self.puzzle_num)
+        patch_list_disordered = [patch_list[i] for i in list(u_label)]
+        label_list_disordered = [label_list[i] for i in list(u_label)]
+
+
+        image = np.stack(patch_list_disordered, 0)
+        label = np.stack(label_list_disordered, 0)
+        if self.flag_pair:
+            b_label = np.zeros((self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
+
+            index = 0
+            for i in range(self.puzzle_num):
+                for j in range(i + 1, self.puzzle_num):
+                    gap = u_label[j] - u_label[i]
+                    if   gap ==  1:
+                        b_label[index] = 0
+                    elif gap == -1:
+                        b_label[index] = 1
+                    elif gap ==  self.puzzle_config:
+                        b_label[index] = 2
+                    elif gap == -self.puzzle_config:
+                        b_label[index] = 3
+                    elif gap ==  self.puzzle_config ** 2:
+                        b_label[index] = 4
+                    elif gap == -self.puzzle_config ** 2:
+                        b_label[index] = 5
+                    else:
+                        b_label[index] = 6
+                    index += 1
+            return {'image' : image, 'label': label, 'u_label' : u_label, 'b_label' : b_label}
+        else:
+            return {'image' : image, 'label': label, 'u_label' : u_label}
