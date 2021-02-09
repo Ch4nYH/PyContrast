@@ -16,6 +16,7 @@ from models.mem_moco import RGBMoCo, RGBMoCoNew
 
 args = parse_args()
 args.pretrain = True
+args.jigsaw = True
 
 os.environ['MASTER_PORT'] = args.port
 root_path = 'exps/exp{}'.format(args.exp)
