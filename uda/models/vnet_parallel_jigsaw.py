@@ -157,6 +157,7 @@ class VNet(nn.Module):
         )
 
     def normal_forward(self, x, u_label, b_label):
+        print(x.shape)
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
         out64 = self.down_tr64(out32)
@@ -168,6 +169,8 @@ class VNet(nn.Module):
         out = self.up_tr64(out, out32)
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
+
+        
         return out, out256
 
     def encode(self, x):
