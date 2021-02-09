@@ -157,8 +157,6 @@ class VNet(nn.Module):
         )
 
     def forward(self, x, u_label, b_label):
-        x = x.squeeze(0)
-        print(x)
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
         out64 = self.down_tr64(out32)
