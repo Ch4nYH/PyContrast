@@ -208,6 +208,7 @@ class VNet(nn.Module):
                     results_stack[i, results[j][1]] = results[j][0]
 
             results_stack = torch.from_numpy(results_stack).long().cuda()
+            print(results_stack.shape)
             cur_perm = torch.gather(cur_perm, 1, results_stack)
             perm_list.append(cur_perm)
 
