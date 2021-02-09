@@ -158,6 +158,12 @@ class VNet(nn.Module):
             nn.Linear(512, 7)
         )
 
+        self.head = nn.Sequential(
+            nn.Linear(16384, 1024),
+            nn.Linear(1024, 128),
+            Normalize(2)
+        )
+
     def forward(self, x, u_label, b_label):
         tower_size = x.shape[0]
         x = x.transpose(0, 1)
@@ -235,4 +241,4 @@ class VNet(nn.Module):
         binary_stack = torch.stack(binary_list, dim=1)
         binary_stack = binary_stack.view(-1, 7)
         
-        return out, out256.view(8, -1), unary_list, perm_list, binary_stack
+        return out,  self.head(out256.view(8, -1)), unary_list, perm_list, binary_stack
