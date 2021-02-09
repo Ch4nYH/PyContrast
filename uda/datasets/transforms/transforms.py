@@ -272,7 +272,7 @@ class RandomCropJigsaw(object):
         if self.is_binary:
             label[label > 1] = 0
         (w, h, d) = image.shape
-        print(w, h, d)
+        #print(w, h, d)
         w_c = np.random.randint(0, w - self.cell_size * self.puzzle_config + 1)
         h_c = np.random.randint(0, h - self.cell_size * self.puzzle_config + 1)
         d_c = np.random.randint(0, d - self.cell_size * self.puzzle_config + 1)
