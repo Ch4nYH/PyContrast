@@ -156,7 +156,7 @@ class VNet(nn.Module):
             nn.Linear(512, 7)
         )
 
-    def normal_forward(self, x, u_label, b_label):
+    def forward(self, x, u_label, b_label):
         print(x.shape)
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
@@ -172,32 +172,3 @@ class VNet(nn.Module):
 
         
         return out, out256
-
-    def encode(self, x):
-        out16 = self.in_tr(x)
-        out32 = self.down_tr32(out16)
-        out64 = self.down_tr64(out32)
-        out128 = self.down_tr128(out64)
-        out256 = self.down_tr256(out128)
-        # out256: (8, 256, 4, 4, 4)
-        # TODO: if we need a pool here?
-        out256 = F.max_pool3d(out256, 2, stride = 2)
-        out256 = out256.view(out256.shape[0], -1)
-        return out256
-
-    def pretrain_forward(self, x, x_jig=None):
-        #print(x.shape)
-        x = self.encode(x)
-        #print(x.shape)
-        feat = self.head(x)
-        if self.jigsaw:
-            feat_jig = self.head_jig(self.encode(x_jig))
-            return feat, feat_jig
-        else:
-            return feat
-        
-    def forward(self, x, pretrain=False):
-        if pretrain:
-            return self.pretrain_forward(x)
-        else:
-            return self.normal_forward(x)
