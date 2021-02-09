@@ -156,6 +156,7 @@ class RandomTranspose(object):
 
         sample['image'] = image
         sample['label'] = label
+        print(image.shape)
         return sample
 
     def _trans(self, image, label):
@@ -303,7 +304,6 @@ class RandomCropJigsaw(object):
 
 
         image = np.stack(patch_list_disordered, 0)
-        print(image.shape)
         label = np.stack(label_list_disordered, 0)
         if self.flag_pair:
             b_label = np.zeros(int(self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
