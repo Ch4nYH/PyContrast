@@ -110,9 +110,9 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 		volume2 = volume2.view((-1, 8,) + volume2.shape[3:])
 		print(volume.shape)
 		with torch.cuda.amp.autocast(): 
-			q = model(volume, batch['u_label'], batch['b_label'])
+			q, unary_list1, perm_list1, binary_stack1 = model(volume, batch['u_label'], batch['b_label'])
 			with torch.no_grad():
-				k = model_ema(volume2, batch['u_label_2'], batch['b_label_2'])
+				k, unary_list2, perm_list2, binary_stack2 = model_ema(volume2, batch['u_label_2'], batch['b_label_2'])
 
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
