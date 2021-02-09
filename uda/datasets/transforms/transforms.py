@@ -204,7 +204,6 @@ class ToTensor(object):
         
         for key in sample.keys():
             image = sample[key]
-            print(image.shape)
             if image.ndim >= 5:                                                     # already has channel dim
                 image = torch.from_numpy(image.astype(np.float32))
             else:

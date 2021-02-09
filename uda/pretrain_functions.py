@@ -103,6 +103,7 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 	scaler = torch.cuda.amp.GradScaler() 
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
+		print(batch['image'].shape)
 		volume = batch['image'].cuda(non_blocking = True)
 		volume = volume.view((-1,) + volume.shape[2:])
 
