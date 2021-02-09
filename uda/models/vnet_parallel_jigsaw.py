@@ -2,7 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import numpy as np 
+
 from .utils import Normalize, JigsawHead
+from .hungarian import Hungarian
 
 def passthrough(x, **kwargs):
     return x
@@ -119,7 +122,6 @@ class OutputTransition(nn.Module):
         self.bn1 = ContBatchNorm3d(inChans // 2)
         self.conv2 = nn.Conv3d(inChans // 2, n_classes, kernel_size=1)
         self.relu1 = ELUCons(elu, inChans // 2)
-        print(n_classes)
 
     def forward(self, x):
         # convolve 32 down to n_classes channels
@@ -148,7 +150,7 @@ class VNet(nn.Module):
         
         self.unary_fc = nn.Sequential(
             nn.Linear(1024 * 8, 4096),
-            nn.Linear(4096, 8),
+            nn.Linear(4096, 64),
         )
 
         self.binary_fc = nn.Sequential(
@@ -164,11 +166,73 @@ class VNet(nn.Module):
         out128 = self.down_tr128(out64)
         out256 = self.down_tr256(out128)
 
+        unary_list = []
+        perm_list = []
+        cur_perm = u_label
+
+        ## first iter
+        
+
         out = self.up_tr256(out256, out128)
         out = self.up_tr128(out, out64)
         out = self.up_tr64(out, out32)
         out = self.up_tr32(out, out16)
         out = self.out_tr(out)
 
+        features = torch.reshape(out256, \
+                                (x.shape[1], \
+                                 8 * 1024))
+        u_out = self.unary_fc(features)
+        u_out = u_out.view(x.shape[1], 8, 8)
+        u_out = F.log_softmax(u_out, 2)
+        unary_list.append(u_out)
+        perm_list.append(cur_perm)
+        tower_size = x.shape[1]
+        for iter_id in range(5 - 1):
+            ### hungarian algorithm for new permutation
+            out_detach = u_out.detach().cpu().numpy()
+            feature_stack_detach =  out256.detach().cpu().numpy()
+            hungarian = Hungarian()
+
+            new_feature_stack = np.zeros_like(feature_stack_detach)
+            results_stack = np.zeros((tower_size, 8))
+
+            for i in range(tower_size):
+                hungarian.calculate(-1 * out_detach[i,:,:])
+                results = hungarian.get_results()
+
+                for j in range(8):
+                    new_feature_stack[i, results[j][1], :] = \
+                        feature_stack_detach[i, results[j][0], :]
+                    results_stack[i, results[j][1]] = results[j][0]
+
+            results_stack = torch.from_numpy(results_stack).long().cuda()
+            cur_perm = torch.gather(cur_perm, 1, results_stack)
+            perm_list.append(cur_perm)
+
+            ### new iteration
+            feature_stack = torch.from_numpy(new_feature_stack).float().cuda()
+            features = torch.reshape(feature_stack, \
+                                    (tower_size, \
+                                     8 * 2048))
+
+            u_out = self.unary_fc(features)
+            u_out2 = u_out2.view(tower_size, 8, 8)
+            u_out = F.log_softmax(u_out, 2)
+            unary_list.append(u_out)
+
+    
+        # binary loss
+        binary_list = []
+        for i in range(self.puzzle_num):
+            for j in range(i + 1, self.puzzle_num):
+                feature_pair = torch.cat([out256[i], \
+                                          out256[j]], dim=1)
+                b_out = self.binary_fc(feature_pair)
+                b_out = F.log_softmax(b_out, 1)
+                binary_list.append(b_out)
+
+        binary_stack = torch.stack(binary_list, dim=1)
+        binary_stack = binary_stack.view(-1, 7)
         
-        return out, out256
+        return out, unary_list, perm_list, binary_stack
