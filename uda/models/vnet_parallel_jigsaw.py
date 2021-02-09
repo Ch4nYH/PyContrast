@@ -170,6 +170,7 @@ class VNet(nn.Module):
         unary_list = []
         perm_list = []
         cur_perm = u_label
+        print(cur_perm.shape)
 
         ## first iter
         
