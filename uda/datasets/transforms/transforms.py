@@ -305,7 +305,7 @@ class RandomCropJigsaw(object):
         image = np.stack(patch_list_disordered, 0)
         label = np.stack(label_list_disordered, 0)
         if self.flag_pair:
-            b_label = np.zeros((self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
+            b_label = np.zeros(int(self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
 
             index = 0
             for i in range(self.puzzle_num):
