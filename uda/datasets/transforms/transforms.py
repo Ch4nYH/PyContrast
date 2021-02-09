@@ -16,7 +16,7 @@ class RandomContrast(object):
         self.per_channel = per_channel
         
     def __call__(self, sample):
-        print(sample.keys())
+        
         image = sample['image'] 
         if not self.per_channel:
             mn = image.mean()
@@ -141,7 +141,7 @@ class RandomTranspose(object):
     Randomly transpose axis
     '''
     def __call__(self, sample):
-        print(sample.keys())
+        
         image, label = sample['image'], sample['label']
         assert image.shape == label.shape
 
@@ -169,7 +169,7 @@ class RandomRotate(object):
     Randomly rotate the image
     '''
     def __call__(self, sample):
-        print(sample.keys())
+        
         image, label = sample['image'], sample['label']
         if image.ndim == 3:
             image, label = self._rotate(image, label)
@@ -201,7 +201,7 @@ class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
-        print(sample.keys())
+        
         for key in sample.keys():
             image = sample[key]
 
@@ -266,7 +266,7 @@ class RandomCropJigsaw(object):
         self.puzzle_num = self.puzzle_config ** 3
         self.is_binary = is_binary
     def __call__(self, sample):
-        print(sample.keys())
+        
         image = sample['image']
         label = sample['label']
         if self.is_binary:
@@ -303,6 +303,7 @@ class RandomCropJigsaw(object):
 
 
         image = np.stack(patch_list_disordered, 0)
+        print(image.shape)
         label = np.stack(label_list_disordered, 0)
         if self.flag_pair:
             b_label = np.zeros(int(self.puzzle_num * (self.puzzle_num - 1) / 2), dtype="int64")
