@@ -104,10 +104,10 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 	for i, batch in enumerate(tqdm(loader)):
 		index = batch['index']
 		volume = batch['image'].cuda(non_blocking = True)
-		volume = volume.view((-1,) + volume.shape[3:])
+		volume = volume.view((-1, 8,) + volume.shape[3:])
 
 		volume2 = batch['image_2'].cuda(non_blocking = True)
-		volume2 = volume2.view((-1,) + volume2.shape[3:])
+		volume2 = volume2.view((-1, 8,) + volume2.shape[3:])
 		print(volume.shape)
 		with torch.cuda.amp.autocast(): 
 			q = model(volume, batch['u_label'], batch['b_label'])
