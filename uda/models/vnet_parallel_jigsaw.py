@@ -149,12 +149,12 @@ class VNet(nn.Module):
         self.pretrain = pretrain
         
         self.unary_fc = nn.Sequential(
-            nn.Linear(1024 * 8, 4096),
+            nn.Linear(16384 * 8, 4096),
             nn.Linear(4096, 64),
         )
 
         self.binary_fc = nn.Sequential(
-            nn.Linear(1024 * 2, 512),
+            nn.Linear(16384 * 2, 512),
             nn.Linear(512, 7)
         )
 
