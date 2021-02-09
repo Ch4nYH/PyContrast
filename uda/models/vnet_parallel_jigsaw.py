@@ -224,8 +224,8 @@ class VNet(nn.Module):
     
         # binary loss
         binary_list = []
-        for i in range(self.puzzle_num):
-            for j in range(i + 1, self.puzzle_num):
+        for i in range(8):
+            for j in range(i + 1, 8):
                 feature_pair = torch.cat([out256[i], \
                                           out256[j]], dim=1)
                 b_out = self.binary_fc(feature_pair)
