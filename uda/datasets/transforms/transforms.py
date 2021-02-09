@@ -207,7 +207,7 @@ class ToTensor(object):
             else:
                 image = torch.from_numpy(image.astype(np.float32)).unsqueeze(1)     # Crop_num, 1, h, w, l
 
-            sample[key] = torch.from_numpy(image)
+            sample[key] = image
 
         return sample
 
