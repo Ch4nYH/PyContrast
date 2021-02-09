@@ -236,4 +236,4 @@ class VNet(nn.Module):
         binary_stack = torch.stack(binary_list, dim=1)
         binary_stack = binary_stack.view(-1, 7)
         
-        return out, unary_list, perm_list, binary_stack
+        return out, out256.view(8, -1), unary_list, perm_list, binary_stack
