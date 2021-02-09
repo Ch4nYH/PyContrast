@@ -217,7 +217,7 @@ class VNet(nn.Module):
                                      8 * 16384))
 
             u_out = self.unary_fc(features)
-            u_out2 = u_out2.view(tower_size, 8, 8)
+            u_out = u_out.view(tower_size, 8, 8)
             u_out = F.log_softmax(u_out, 2)
             unary_list.append(u_out)
 
