@@ -226,8 +226,8 @@ class VNet(nn.Module):
         binary_list = []
         for i in range(8):
             for j in range(i + 1, 8):
-                feature_pair = torch.cat([out256[i], \
-                                          out256[j]], dim=1)
+                feature_pair = torch.cat([out256[i].view(1, -1), \
+                                          out256[j].view(1, -1)], dim=1)
                 print(feature_pair.shape)
                 b_out = self.binary_fc(feature_pair)
                 b_out = F.log_softmax(b_out, 1)
