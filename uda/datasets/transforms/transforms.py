@@ -257,7 +257,7 @@ class GaussianBlur(object):
 # Begin Jigsaw Transformations
 
 class RandomCropJigsaw(object):
-    def __init__(self, cell_size=96, patch_size=64, puzzle_config=2, flag_pair=True, is_binary=True):
+    def __init__(self, cell_size=70, patch_size=64, puzzle_config=2, flag_pair=True, is_binary=True):
         self.cell_size = cell_size
         self.patch_size = patch_size
         self.puzzle_config = puzzle_config
