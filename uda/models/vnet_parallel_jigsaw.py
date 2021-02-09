@@ -159,6 +159,7 @@ class VNet(nn.Module):
         )
 
     def forward(self, x, u_label, b_label):
+        tower_size = x.shape[0]
         x = x.transpose(0, 1)
         out16 = self.in_tr(x)
         out32 = self.down_tr32(out16)
@@ -172,7 +173,6 @@ class VNet(nn.Module):
 
         ## first iter
         
-
         out = self.up_tr256(out256, out128)
         out = self.up_tr128(out, out64)
         out = self.up_tr64(out, out32)
@@ -180,14 +180,14 @@ class VNet(nn.Module):
         out = self.out_tr(out)
 
         features = torch.reshape(out256, \
-                                (x.shape[1], \
-                                 8 * 1024))
+                                (tower_size, \
+                                 8 * 16384))
         u_out = self.unary_fc(features)
-        u_out = u_out.view(x.shape[1], 8, 8)
+        u_out = u_out.view(tower_size], 8, 8)
         u_out = F.log_softmax(u_out, 2)
         unary_list.append(u_out)
         perm_list.append(cur_perm)
-        tower_size = x.shape[1]
+        
         for iter_id in range(5 - 1):
             ### hungarian algorithm for new permutation
             out_detach = u_out.detach().cpu().numpy()
@@ -214,7 +214,7 @@ class VNet(nn.Module):
             feature_stack = torch.from_numpy(new_feature_stack).float().cuda()
             features = torch.reshape(feature_stack, \
                                     (tower_size, \
-                                     8 * 2048))
+                                     8 * 16384))
 
             u_out = self.unary_fc(features)
             u_out2 = u_out2.view(tower_size, 8, 8)
