@@ -197,7 +197,7 @@ class DatasetInstanceJigsaw(Dataset):
         if self.transform is not None:
             sample = self.transform(sample_pre_transform)
             sample2 = self.transform(sample_pre_transform)
-            for key in sample.keys():
+            for key in sample2.keys():
                 sample[key + '_2'] = sample2[key]
         else:
             sample = sample_pre_transform
