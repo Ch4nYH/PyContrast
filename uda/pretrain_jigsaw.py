@@ -26,7 +26,7 @@ if not os.path.exists(root_path):
 	os.mkdir(os.path.join(root_path, "model"))
 
 base_lr = args.lr  # base learning rate
-train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, sampling = args.sampling)
+train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list, sampling = args.sampling, jigsaw=args.jigsaw)
     
 train_loader = torch.utils.data.DataLoader(
     train_dataset, batch_size=args.batch_size, 
