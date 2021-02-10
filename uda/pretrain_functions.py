@@ -28,9 +28,10 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 
 		volume2 = batch['image_2'].cuda(args.local_rank, non_blocking = True)
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
-  
+
 		with torch.cuda.amp.autocast(): 
 			q = model(volume, encode=True)
+			print(q.shape)
 			with torch.no_grad():
 				k = model_ema(volume2, encode=True)
 
