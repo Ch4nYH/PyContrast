@@ -44,8 +44,8 @@ model_ema = VNet(args.n_channels, args.n_classes, input_size = 64, pretrain = Tr
 
 
 optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
-model = torch.nn.DataParllel(model)
-model_ema = torch.nn.DataParllel(model_ema)
+model = torch.nn.DataParallel(model)
+model_ema = torch.nn.DataParallel(model_ema)
 model_ema.load_state_dict(model.state_dict())
 print("Model Initialized")
 logger = Logger(root_path)
