@@ -88,7 +88,7 @@ def unary_loss(output_list, label_list):
 
 	for i in range(len(output_list)):
 		output = output_list[i].view(-1, puzzle_num)
-		label = label_list[i].view(-1)
+		label = label_list[i].view(-1).long()
 		loss_list.append(loss(output, label))
 	return torch.mean(torch.stack(loss_list))
 
