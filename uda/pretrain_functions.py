@@ -136,7 +136,7 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 			k = k[batch['u_label_2'].view(-1).long()]
 			q = q[b_label.view(-1)]
 
-			u_loss = unary_loss(unary_list1, perm_list1.long())
+			u_loss = unary_loss(unary_list1, perm_list1)
 			b_loss = binary_loss(binary_stack1, b_label)
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
