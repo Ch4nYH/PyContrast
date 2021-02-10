@@ -268,6 +268,12 @@ class RandomCropJigsaw(object):
         
         image = sample['image']
         label = sample['label']
+        if image.shape[0] < 128 or image.shape[1] < 128 or image.shape[2] < 128:
+            pad_x = max(0, 128 - image.shape[0] + 1)
+            pad_y = max(0, 128 - image.shape[1] + 1)
+            pad_z = max(0, 128 - image.shape[2] + 1)
+            image = np.pad(image, ((0, pad_x), (0, pad_y), (0, pad_z)), 'mean')
+            label = np.pad(label, ((0, pad_x), (0, pad_y), (0, pad_z)), 'constant')
         if self.is_binary:
             label[label > 1] = 0
         (w, h, d) = image.shape
