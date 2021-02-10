@@ -1,5 +1,5 @@
 import torch
-
+import torch.nn as nn
 from tqdm import tqdm
 from utils.utils import cross_entropy_3d, dice, AverageMeter, compute_loss_accuracy
 from models import mem_moco
@@ -81,6 +81,22 @@ def momentum_update(model, model_ema, m = 0.999):
         for p1, p2 in zip(model.parameters(), model_ema.parameters()):
             p2.data.mul_(m).add_(1 - m, p1.detach().data)
 
+def unary_loss(output_list, label_list):
+	loss_list = []
+	puzzle_num = output_list[0].shape[2]
+	loss = nn.NLLLoss()
+
+	for i in range(len(output_list)):
+		output = output_list[i].view(-1, puzzle_num)
+		label = label_list[i].view(-1)
+		loss_list.append(loss(output, label))
+	return torch.mean(torch.stack(loss_list))
+
+def binary_loss(b_stack, b_label_batch):
+	b_label_batch = b_label_batch.view(-1)
+	loss = nn.NLLLoss()
+
+	return loss(b_stack, b_label_batch)
 
 
 def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion):
@@ -113,6 +129,12 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 			_, q, unary_list1, perm_list1, binary_stack1 = model(volume, batch['u_label'], batch['b_label'])
 			with torch.no_grad():
 				_, k, unary_list2, perm_list2, binary_stack2 = model_ema(volume2, batch['u_label_2'], batch['b_label_2'])
+			
+			k = k[batch['u_label_2'].view(-1)]
+			q = q[batch['u_label'].view(-1)]
+
+			u_loss = unary_loss(unary_list1, perm_list1)
+			b_loss = binary_loss(binary_stack1, batch['b_label'])
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
 							logits=output[:-1], target=output[-1],
@@ -126,7 +148,7 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 		#loss = cross_entropy_3d(output, label)
 
 		optimizer.zero_grad()
-		scaler.scale(loss).backward() 
+		scaler.scale(loss + u_loss + b_loss).backward() 
 		scaler.step(optimizer)
 		scaler.update() 
 
