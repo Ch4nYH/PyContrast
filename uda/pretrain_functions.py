@@ -30,9 +30,9 @@ def pretrain(model, model_ema, loader, optimizer, logger, saver, args, epoch, co
 		volume2 = volume2.view((-1,) + volume2.shape[2:])
   
 		with torch.cuda.amp.autocast(): 
-			q = model(volume)
+			q = model(volume, encode=True)
 			with torch.no_grad():
-				k = model_ema(volume2)
+				k = model_ema(volume2, encode=True)
 
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
