@@ -124,6 +124,9 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 
 		volume2 = batch['image_2'].cuda(non_blocking = True)
 		volume2 = volume2.view((-1, 8,) + volume2.shape[3:])
+		b_label = batch['b_label'].long()
+		u_label = batch['u_label'].long()
+
 		print(volume.shape)
 		with torch.cuda.amp.autocast(): 
 			_, q, unary_list1, perm_list1, binary_stack1 = model(volume, batch['u_label'], batch['b_label'])
@@ -131,10 +134,10 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 				_, k, unary_list2, perm_list2, binary_stack2 = model_ema(volume2, batch['u_label_2'], batch['b_label_2'])
 			
 			k = k[batch['u_label_2'].view(-1).long()]
-			q = q[batch['u_label'].view(-1).long()]
+			q = q[b_label.view(-1)]
 
-			u_loss = unary_loss(unary_list1, perm_list1)
-			b_loss = binary_loss(binary_stack1, batch['b_label'])
+			u_loss = unary_loss(unary_list1, perm_list1.long())
+			b_loss = binary_loss(binary_stack1, b_label)
 			output = contrast(q, k, all_k=None)
 			losses, accuracies = compute_loss_accuracy(
 							logits=output[:-1], target=output[-1],
