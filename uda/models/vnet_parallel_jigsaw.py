@@ -221,7 +221,7 @@ class VNet(nn.Module):
             ### new iteration
             feature_stack = torch.from_numpy(new_feature_stack).float().cuda()
             features = torch.reshape(feature_stack, \
-                                    (tower_size, \
+                                    (tower_size, 1, \
                                      8 * 16384))
 
             u_out = self.unary_fc(features)
