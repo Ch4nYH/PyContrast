@@ -149,7 +149,8 @@ class VNet(nn.Module):
         self.pretrain = pretrain
         
         self.unary_fc = nn.Sequential(
-            nn.AvgPool1d(4), 
+            nn.AvgPool1d(4,4),
+            nn.Flatten(),  
             nn.Linear(16384 * 2, 4096),
             nn.Linear(4096, 64),
         )
@@ -187,7 +188,7 @@ class VNet(nn.Module):
         #out = self.out_tr(out)
 
         features = torch.reshape(out256, \
-                                (tower_size, \
+                                (tower_size, 1, \
                                  8 * 16384))
         u_out = self.unary_fc(features)
         u_out = u_out.view(tower_size, 8, 8)
