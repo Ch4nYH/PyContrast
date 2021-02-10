@@ -149,7 +149,8 @@ class VNet(nn.Module):
         self.pretrain = pretrain
         
         self.unary_fc = nn.Sequential(
-            nn.Linear(16384 * 8, 4096),
+            nn.AvgPool1d(4), 
+            nn.Linear(16384 * 2, 4096),
             nn.Linear(4096, 64),
         )
 
