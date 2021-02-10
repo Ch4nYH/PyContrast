@@ -96,7 +96,7 @@ def binary_loss(b_stack, b_label_batch):
 	b_label_batch = b_label_batch.view(-1)
 	loss = nn.NLLLoss()
 
-	return loss(b_stack, b_label_batch)
+	return loss(b_stack.cuda(), b_label_batch.cuda())
 
 
 def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, epoch, contrast, criterion):
