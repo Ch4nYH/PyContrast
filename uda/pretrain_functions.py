@@ -127,7 +127,6 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 		b_label = batch['b_label'].long()
 		u_label = batch['u_label'].long()
 
-		print(volume.shape)
 		with torch.cuda.amp.autocast(): 
 			_, q, unary_list1, perm_list1, binary_stack1 = model(volume, batch['u_label'], batch['b_label'])
 			with torch.no_grad():
