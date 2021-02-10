@@ -179,11 +179,11 @@ class VNet(nn.Module):
 
         ## first iter
         
-        out = self.up_tr256(out256, out128)
-        out = self.up_tr128(out, out64)
-        out = self.up_tr64(out, out32)
-        out = self.up_tr32(out, out16)
-        out = self.out_tr(out)
+        #out = self.up_tr256(out256, out128)
+        #out = self.up_tr128(out, out64)
+        #out = self.up_tr64(out, out32)
+        #out = self.up_tr32(out, out16)
+        #out = self.out_tr(out)
 
         features = torch.reshape(out256, \
                                 (tower_size, \
@@ -241,4 +241,4 @@ class VNet(nn.Module):
         binary_stack = torch.stack(binary_list, dim=1)
         binary_stack = binary_stack.view(-1, 7)
         
-        return out,  self.head(out256.view(8, -1)), unary_list, perm_list, binary_stack
+        return None, self.head(out256.view(8, -1)), unary_list, perm_list, binary_stack
