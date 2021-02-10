@@ -171,8 +171,11 @@ class VNet(nn.Module):
         out = self.out_tr(out)
         return out, out256
 
-    def forward(self, x):
-        return self.normal_forward(x)
+    def forward(self, x, encode=False):
+        if encode:
+            return self.encode(x)
+        else:
+            return self.normal_forward(x)
 
     def encode(self, x):
         out16 = self.in_tr(x)
