@@ -130,8 +130,8 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 			with torch.no_grad():
 				_, k, unary_list2, perm_list2, binary_stack2 = model_ema(volume2, batch['u_label_2'], batch['b_label_2'])
 			
-			k = k[batch['u_label_2'].view(-1)]
-			q = q[batch['u_label'].view(-1)]
+			k = k[batch['u_label_2'].view(-1).long()]
+			q = q[batch['u_label'].view(-1).long()]
 
 			u_loss = unary_loss(unary_list1, perm_list1)
 			b_loss = binary_loss(binary_stack1, batch['b_label'])
