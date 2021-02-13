@@ -51,9 +51,9 @@ print("Model Initialized")
 logger = Logger(root_path)
 saver = Saver(root_path, save_freq = args.save_freq)
 if args.sampling == 'default':
-    contrast = RGBMoCo(128, K = 2048, T = args.temperature).cuda()
+    contrast = RGBMoCo(2048, K = 4096, T = args.temperature).cuda()
 elif args.sampling == 'layerwise':
-    contrast = RGBMoCoNew(128, K = 2048, T = args.temperature).cuda()
+    contrast = RGBMoCoNew(2048, K = 4096, T = args.temperature).cuda()
 else:
     raise ValueError("unsupported sampling method")
 criterion = torch.nn.CrossEntropyLoss()

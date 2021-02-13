@@ -187,7 +187,7 @@ class VNet(nn.Module):
         # TODO: if we need a pool here?
         out256 = F.max_pool3d(out256, 2, stride = 2)
         out256 = out256.view(out256.shape[0], -1)
-        return out256
+        return self.head(out256)
 
     def pretrain_forward(self, x, x_jig=None):
         #print(x.shape)
