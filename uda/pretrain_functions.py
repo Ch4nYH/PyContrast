@@ -151,7 +151,7 @@ def pretrain_jigsaw(model, model_ema, loader, optimizer, logger, saver, args, ep
 		#loss = cross_entropy_3d(output, label)
 
 		optimizer.zero_grad()
-		scaler.scale(loss + u_loss + b_loss).backward() 
+		scaler.scale(loss + (u_loss + b_loss) * 0.1).backward() 
 		scaler.step(optimizer)
 		scaler.update() 
 
