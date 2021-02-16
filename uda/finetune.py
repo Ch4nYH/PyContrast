@@ -23,14 +23,13 @@ def main():
     
     root_path = 'exps/exp_{}'.format(args.exp)
  
-    if not os.path.exists(root_path) and args.local_rank == 0:
+    if not os.path.exists(root_path):
         os.mkdir(root_path)
         os.mkdir(os.path.join(root_path, "log"))
         os.mkdir(os.path.join(root_path, "model"))
     
     base_lr = args.lr  # base learning rate
     
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list)
   
     train_loader = torch.utils.data.DataLoader(
