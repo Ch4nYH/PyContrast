@@ -20,7 +20,6 @@ def main():
 
     args = parse_args()
     args.pretrain = False
-    print("Using GPU: {}".format(args.local_rank))
     
     root_path = 'exps/exp_{}'.format(args.exp)
  
@@ -33,37 +32,24 @@ def main():
     
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     train_dataset, val_dataset = build_dataset(args.dataset, args.data_root, args.train_list)
-    args.world_size = len(args.gpu.split(","))
-    if args.world_size > 1:
-        os.environ['MASTER_PORT'] = args.port
-        torch.cuda.set_device(args.local_rank)
-        torch.distributed.init_process_group(
-            'nccl'
-        )
-        device = torch.device('cuda:{}'.format(args.local_rank))
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas = len(args.gpu.split(",")), rank = args.local_rank)
-    else:
-        train_sampler = None
   
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batch_size, 
-        shuffle=(train_sampler is None),
-        sampler = train_sampler,
+        shuffle=True,
         num_workers=args.num_workers, pin_memory=True)
     
     val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=1, 
         num_workers=args.num_workers, pin_memory=True)
 
-    model = VNet(args.n_channels, args.n_classes).cuda(args.local_rank)
+    model = VNet(args.n_channels, args.n_classes).cuda()
 
-    
 
     
     optimizer = torch.optim.SGD(model.parameters(), lr = args.lr, momentum=0.9, weight_decay=0.0005)
     #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.7)
-    if args.world_size > 1:
-        model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+    
+    model = torch.nn.DataParallel(model)
 
     model.train()
     
@@ -91,7 +77,6 @@ def main():
     saver = Saver(root_path)
 
     for epoch in range(args.start_epoch, args.epochs):
-        train_sampler.set_epoch(epoch)
         train(model, train_loader, optimizer, logger, args, epoch)
         validate(model, val_loader, optimizer, logger, saver, args, epoch)
         adjust_learning_rate(args, optimizer, epoch)
